@@ -14,3 +14,16 @@ fun OffsetScreen() {
 fun OffsetScreenPreview() {
     OffsetScreen()
 }
+
+@Composable
+fun ProjectCard(
+
+) {
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProjectCardPreview() {
+    ProjectCard()
+}
