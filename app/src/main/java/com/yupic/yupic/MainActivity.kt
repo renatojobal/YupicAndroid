@@ -72,8 +72,8 @@ fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val items = listOf(
-        NavigationItem.Home,
         NavigationItem.Form,
+        NavigationItem.Home,
         NavigationItem.Offset
     )
 
@@ -89,7 +89,7 @@ fun BottomNavigationBar(navController: NavController) {
                 selectedContentColor = MaterialTheme.colors.onSurface,
                 unselectedContentColor = MaterialTheme.colors.error,
                 alwaysShowLabel = true,
-                selected = false,
+                selected = currentRoute == item.route,
                 onClick = {
                     navController.navigate(item.route) {
                         // Pop up to the start destination of the graph to
