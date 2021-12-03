@@ -18,7 +18,10 @@ import com.yupic.yupic.ui.OffsetScreen
 import com.yupic.yupic.ui.theme.YupicTheme
 
 import androidx.compose.material.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
+import com.yupic.yupic.ui.NavigationItem
 
 
 class MainActivity : ComponentActivity() {
@@ -36,8 +39,11 @@ fun YupicApp(){
 
         val navController = rememberNavController()
         val backStackEntry = navController.currentBackStackEntryAsState()
+        Scaffold(bottomBar = { BottomNavigationBar(navController)}) {
+            YupicNavHost(navHostController = navController)
+        }
 
-        YupicNavHost(navHostController = navController)
+
 
     }
 }
@@ -46,58 +52,73 @@ fun YupicApp(){
 fun YupicNavHost(navHostController : NavHostController) {
     NavHost(navController = navHostController,
         modifier = Modifier.fillMaxSize(),
-        startDestination = "home"){
-        composable(route="home"){
+        startDestination = NavigationItem.Home.route){
+        composable(route=NavigationItem.Home.route){
             HomeScreen()
         }
-        composable(route="form"){
+        composable(route=NavigationItem.Form.route){
             FormScreen()
         }
-        composable(route="offset"){
+        composable(route=NavigationItem.Offset.route){
             OffsetScreen()
         }
     }
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(navController: NavController) {
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val items = listOf(
+        NavigationItem.Home,
+        NavigationItem.Form,
+        NavigationItem.Offset
+    )
+
     BottomNavigation(
         backgroundColor = MaterialTheme.colors.background,
         contentColor = MaterialTheme.colors.onSurface
     ) {
-        BottomNavigationItem(
-            icon= {Icon(painterResource(id = R.drawable.ic_calculate), contentDescription = "Icon")},
-            label = { Text(text = "test")},
-            selectedContentColor = MaterialTheme.colors.onSurface,
-            unselectedContentColor = MaterialTheme.colors.error,
-            alwaysShowLabel = true,
-            selected = false,
-            onClick = {/*TODO*/ }
-        )
-        BottomNavigationItem(
-            icon= {Icon(painterResource(id = R.drawable.ic_check), contentDescription = "Icon")},
-            label = { Text(text = "test")},
-            selectedContentColor = MaterialTheme.colors.onSurface,
-            unselectedContentColor = MaterialTheme.colors.error,
-            alwaysShowLabel = true,
-            selected = false,
-            onClick = {/*TODO*/ }
-        )
-        BottomNavigationItem(
-            icon= {Icon(painterResource(id = R.drawable.ic_money), contentDescription = "Icon")},
-            label = { Text(text = "test")},
-            selectedContentColor = MaterialTheme.colors.onSurface,
-            unselectedContentColor = MaterialTheme.colors.error,
-            alwaysShowLabel = true,
-            selected = false,
-            onClick = {/*TODO*/ }
-        )
+
+        items.forEach{item ->
+            BottomNavigationItem(
+                icon= {Icon(painterResource(id = item.icon), contentDescription = item.title)},
+                label = { Text(text = item.title)},
+                selectedContentColor = MaterialTheme.colors.onSurface,
+                unselectedContentColor = MaterialTheme.colors.error,
+                alwaysShowLabel = true,
+                selected = false,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
+                            }
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+            )
+
+        }
+
+
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
 fun BottomNavBarPreview() {
-    BottomNavigationBar()
+    // BottomNavigationBar()
 }
 
