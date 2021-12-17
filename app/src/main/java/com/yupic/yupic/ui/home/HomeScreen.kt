@@ -4,6 +4,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -21,14 +23,28 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yupic.yupic.R
+import com.yupic.yupic.model.Activity
 
 @Composable
 fun HomeScreen (){
-    Box(
-        contentAlignment = Alignment.Center,
+    BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ){
-        CircularProgressBar(percentage = 0.8f, number = 100)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            CircularProgressBar(percentage = 0.8f, number = 100)
+            Button(
+                modifier = Modifier
+                    .padding(4.dp),
+                onClick = { /*TODO*/ }
+            ) {
+                Text(text = "Compensar")
+            }
+            ActivitiesListPresenter(activities = listOf())
+        }
+
     }
 
 }
@@ -44,7 +60,7 @@ fun CircularProgressBar(
     percentage : Float = 0f,
     number : Int,
     fontSize: TextUnit = 28.sp,
-    radius: Dp = 50.dp,
+    radius: Dp = 100.dp,
     color : Color = MaterialTheme.colors.onSurface,
     strokeWidth : Dp = 8.dp,
     animDuration: Int = 1000,
@@ -67,6 +83,7 @@ fun CircularProgressBar(
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(radius * 2f)
+            .padding(8.dp)
     ){
         Canvas(modifier = Modifier.size(radius * 2f)){
             drawArc(
@@ -96,9 +113,7 @@ fun CircularProgressPreview() {
 
 @Composable
 fun ActivityItem(
-    percentage: Float,
-    title: String,
-    iconResource: Int
+    activity: Activity
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row (
@@ -108,9 +123,9 @@ fun ActivityItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ){
-            Icon(painterResource(id = iconResource), contentDescription = title)
-            Text(text = title)
-            Text(text = (percentage * 100).toInt().toString())
+            Icon(painterResource(id = activity.iconResource), contentDescription = activity.title)
+            Text(text = activity.title)
+            Text(text = (activity.percentage * 100).toInt().toString())
         }
     }
 
@@ -119,5 +134,38 @@ fun ActivityItem(
 @Preview(showBackground = true)
 @Composable
 fun ActivityItemPreview() {
-    ActivityItem(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    val dummyActivity = Activity(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    ActivityItem(dummyActivity)
 }
+
+
+@Composable
+fun ActivitiesListPresenter(activities : List<Activity>) {
+    Text(
+        text = "Activities",
+        modifier = Modifier
+            .padding(4.dp)
+    )
+
+    if (activities.isNotEmpty()){
+        LazyColumn{
+            items(activities.size){index ->
+                ActivityItem(activity = activities[index])
+            }
+        }
+    }else{
+        Text(text = "No hay actividades registradas aún")
+    }
+
+
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ActivitiesListPreview() {
+    val dummyActivity1 = Activity(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    val dummyActivity2 = Activity(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    ActivitiesListPresenter(listOf(dummyActivity1, dummyActivity2))
+}
+
