@@ -3,6 +3,10 @@ package com.yupic.yupic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,7 +22,10 @@ import com.yupic.yupic.ui.OffsetScreen
 import com.yupic.yupic.ui.theme.YupicTheme
 
 import androidx.compose.material.*
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.yupic.yupic.ui.BottomNavigationItem
@@ -26,6 +33,7 @@ import com.yupic.yupic.ui.login.LoginScreen
 
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -34,24 +42,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun YupicApp(){
     YupicTheme{
 
         val navController = rememberNavController()
         val backStackEntry = navController.currentBackStackEntryAsState()
-        val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+        // State of bottomBar, set state to false, if current page route is "car_details"
+        val bottomBarState = rememberSaveable {(mutableStateOf(true))}
+
 
         Scaffold(
             bottomBar = {
-                if (currentRoute(navController = navController) != "login"){
-                    BottomNavigationBar(navController = navController)
-                }
-            },
-            scaffoldState = scaffoldState
+
+                    BottomBar(
+                        navController = navController,
+                        bottomBarState = bottomBarState
+                    )
+
+            }
         )
         {
-            YupicNavHost(navHostController = navController)
+            YupicNavHost(navHostController = navController, bottomBarState = bottomBarState)
         }
 
 
@@ -61,7 +74,7 @@ fun YupicApp(){
 @Composable
 fun currentRoute(navController: NavHostController): String? {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.arguments?.getString("login")
+    return navBackStackEntry?.arguments?.getString("route")
 }
 
 /**
@@ -72,7 +85,7 @@ fun isUserLogged(): Boolean {
 }
 
 @Composable
-fun YupicNavHost(navHostController : NavHostController) {
+fun YupicNavHost(navHostController: NavHostController, bottomBarState: MutableState<Boolean>) {
     NavHost(navController = navHostController,
         modifier = Modifier.fillMaxSize(),
         startDestination = "login"){
@@ -80,21 +93,30 @@ fun YupicNavHost(navHostController : NavHostController) {
             LoginScreen{
                 navHostController.navigate("home")
             }
+            // show BottomBar
+            bottomBarState.value = false
         }
         composable(route=BottomNavigationItem.Home.route){
             HomeScreen()
+            // show BottomBar
+            bottomBarState.value = true
         }
         composable(route=BottomNavigationItem.Form.route){
             FormScreen()
+            // show BottomBar
+            bottomBarState.value = true
         }
         composable(route=BottomNavigationItem.Offset.route){
             OffsetScreen()
+            // show BottomBar
+            bottomBarState.value = true
         }
     }
 }
 
+@ExperimentalAnimationApi
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean>) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -105,42 +127,52 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavigationItem.Offset
     )
 
-    BottomNavigation(
-        backgroundColor = MaterialTheme.colors.background,
-        contentColor = MaterialTheme.colors.onSurface
-    ) {
+    AnimatedVisibility(
+        visible = bottomBarState.value,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it }),
+        content = {
 
-        items.forEach{item ->
-            BottomNavigationItem(
-                icon= {Icon(painterResource(id = item.icon), contentDescription = item.title)},
-                label = { Text(text = item.title)},
-                selectedContentColor = MaterialTheme.colors.onSurface,
-                unselectedContentColor = MaterialTheme.colors.error,
-                alwaysShowLabel = true,
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
+            BottomNavigation {
+                items.forEach {item ->
+                    BottomNavigationItem(
+                        icon = {
+                            Icon(
+                                painterResource(id = item.icon),
+                                contentDescription = item.title
+                            )
+                        },
+                        label = { Text(text = item.title) },
+                        selectedContentColor = MaterialTheme.colors.onSurface,
+                        unselectedContentColor = MaterialTheme.colors.error,
+                        alwaysShowLabel = true,
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            navController.navigate(item.route) {
+                                // Pop up to the start destination of the graph to
+                                // avoid building up a large stack of destinations
+                                // on the back stack as users select items
+                                navController.graph.startDestinationRoute?.let { route ->
+                                    popUpTo(route) {
+                                        saveState = true
+                                    }
+                                }
+                                // Avoid multiple copies of the same destination when
+                                // reselecting the same item
+                                launchSingleTop = true
+                                // Restore state when reselecting a previously selected item
+                                restoreState = true
                             }
                         }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
+                    )
+
                 }
-            )
+            }
 
         }
+    )
 
 
-    }
 }
 
 
