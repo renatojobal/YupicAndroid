@@ -21,7 +21,8 @@ import androidx.compose.material.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
-import com.yupic.yupic.ui.NavigationItem
+import com.yupic.yupic.ui.BottomNavigationItem
+import com.yupic.yupic.ui.login.LoginScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -39,27 +40,54 @@ fun YupicApp(){
 
         val navController = rememberNavController()
         val backStackEntry = navController.currentBackStackEntryAsState()
-        Scaffold(bottomBar = { BottomNavigationBar(navController)}) {
+        val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+
+        Scaffold(
+            bottomBar = {
+                if (currentRoute(navController = navController) != "login"){
+                    BottomNavigationBar(navController = navController)
+                }
+            },
+            scaffoldState = scaffoldState
+        )
+        {
             YupicNavHost(navHostController = navController)
         }
-
 
 
     }
 }
 
 @Composable
+fun currentRoute(navController: NavHostController): String? {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    return navBackStackEntry?.arguments?.getString("login")
+}
+
+/**
+ *  Todo: Check her if the user is logged
+ */
+fun isUserLogged(): Boolean {
+    return false
+}
+
+@Composable
 fun YupicNavHost(navHostController : NavHostController) {
     NavHost(navController = navHostController,
         modifier = Modifier.fillMaxSize(),
-        startDestination = NavigationItem.Home.route){
-        composable(route=NavigationItem.Home.route){
+        startDestination = "login"){
+        composable(route="login"){
+            LoginScreen{
+                navHostController.navigate("home")
+            }
+        }
+        composable(route=BottomNavigationItem.Home.route){
             HomeScreen()
         }
-        composable(route=NavigationItem.Form.route){
+        composable(route=BottomNavigationItem.Form.route){
             FormScreen()
         }
-        composable(route=NavigationItem.Offset.route){
+        composable(route=BottomNavigationItem.Offset.route){
             OffsetScreen()
         }
     }
@@ -72,9 +100,9 @@ fun BottomNavigationBar(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val items = listOf(
-        NavigationItem.Form,
-        NavigationItem.Home,
-        NavigationItem.Offset
+        BottomNavigationItem.Form,
+        BottomNavigationItem.Home,
+        BottomNavigationItem.Offset
     )
 
     BottomNavigation(

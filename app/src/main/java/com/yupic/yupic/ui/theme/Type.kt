@@ -12,8 +12,8 @@ import com.yupic.yupic.R
 
 val fonts = FontFamily(
     Font(R.font.comfortaa),
-    Font(R.font.comfortaa_bold),
-    Font(R.font.comfortaa_light)
+    Font(R.font.comfortaa_bold, FontWeight.Bold),
+    Font(R.font.comfortaa_light, FontWeight.Light)
 )
 
 val Typography = Typography(
