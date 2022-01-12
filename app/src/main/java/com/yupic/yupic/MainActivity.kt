@@ -71,12 +71,6 @@ fun YupicApp(){
     }
 }
 
-@Composable
-fun currentRoute(navController: NavHostController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.arguments?.getString("route")
-}
-
 /**
  *  Todo: Check her if the user is logged
  */
