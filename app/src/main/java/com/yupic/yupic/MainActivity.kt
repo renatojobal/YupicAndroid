@@ -33,6 +33,8 @@ import com.yupic.yupic.ui.login.LoginScreen
 
 
 class MainActivity : ComponentActivity() {
+
+
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,8 @@ class MainActivity : ComponentActivity() {
             YupicApp()
         }
     }
+
+
 }
 
 @ExperimentalAnimationApi
