@@ -1,11 +1,9 @@
 package com.yupic.yupic.ui.login
 
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,31 +25,42 @@ fun LoginScreen(onLoggedSuccess: () -> Unit) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_yupic),
-                contentDescription = "yupic")
+                contentDescription = "yupic",
+                modifier = Modifier.fillMaxWidth()
+            )
             
-            Text(text = "YUPIC")
-            
-            Button(onClick = {
+            Text(
+                text = "YUPIC",
+                style = MaterialTheme.typography.h2,
+                modifier = Modifier
+                    .padding(16.dp)
+            )
+            val modifierButton = Modifier
+                .padding(horizontal = 40.dp, vertical = 8.dp)
+                .fillMaxWidth()
+            Button(
+                modifier = modifierButton,
+                onClick = {
                 onLoggedSuccess()
             }) {
-                Text(text = "Login with Facebook")
+                Text(text = "LOGIN WITH FACEBOOK", style = MaterialTheme.typography.button)
             }
-            Button(onClick = {
+            Button(modifier = modifierButton,onClick = {
                 onLoggedSuccess()
             }) {
-                Text(text = "Login with Google")
+                Text(text = "LOGIN WITH GOOGLE", style = MaterialTheme.typography.button)
             }
 
-            Button(onClick = {
+            Button(modifier = modifierButton,onClick = {
                 onLoggedSuccess()
             }) {
-                Text(text = "Login with UTPL")
+                Text(text = "LOGITN WITH UTPL", style = MaterialTheme.typography.button)
             }
 
-            Button(onClick = {
+            Button(modifier = modifierButton,onClick = {
                 onLoggedSuccess()
             }) {
-                Text(text = "Register")
+                Text(text = "REGISTER", style = MaterialTheme.typography.button)
             }
 
         }

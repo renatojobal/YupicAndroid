@@ -1,49 +1,66 @@
 package com.yupic.yupic.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.yupic.yupic.model.Node
 
 @Composable
 fun FormScreen() {
-    QuestionCard(
-        Node(
-            title = "¿Qué tipo de transporte usas?",
-            weight = 0.0,
-            nestedNodes = listOf(
-                Node(
-                    "Carro",
-                    weight = 2.0
-                ),
-                Node(
-                    "Transporte público",
-                    weight = 1.0
-                ),
-                Node(
-                    "Tren",
-                    weight = 2.0
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
+        .padding(16.dp)
+    ) {
+        QuestionCard(
+            Node(
+                title = "¿Qué tipo de transporte usas?",
+                weight = 0.0,
+                nestedNodes = listOf(
+                    Node(
+                        "Carro",
+                        weight = 2.0
+                    ),
+                    Node(
+                        "Transporte público",
+                        weight = 1.0
+                    ),
+                    Node(
+                        "Tren",
+                        weight = 2.0
+                    )
                 )
             )
         )
-    )
+    }
+
 }
 
 @Composable
 fun QuestionCard(node: Node) {
-    BoxWithConstraints {
+    BoxWithConstraints (
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colors.primaryVariant, shape = MaterialTheme.shapes.small)
+            .padding(horizontal = 8.dp, vertical = 24.dp)
+            )
+    {
         Column {
-            Text(text = node.title)
+            Text(
+                text = node.title,
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier.padding(vertical = 8.dp),
+                textAlign = TextAlign.Center
+            )
             node.nestedNodes.forEach { targetNode ->
                 SingleSelectableItem(targetNode)
             }
@@ -54,9 +71,25 @@ fun QuestionCard(node: Node) {
 @Composable
 fun SingleSelectableItem(node: Node) {
     val isChecked = remember { mutableStateOf(false) }
-    Box(modifier = Modifier.background(MaterialTheme.colors.primaryVariant)) {
-        Row {
-            Text(text = node.title)
+    BoxWithConstraints(
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colors.onSecondary,
+                shape = MaterialTheme.shapes.large
+            )
+            .padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = node.title,
+            style = MaterialTheme.typography.body1
+            )
             Checkbox(checked = isChecked.value, onCheckedChange = { isChecked.value = it })
         }
     }

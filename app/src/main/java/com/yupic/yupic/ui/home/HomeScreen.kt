@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +27,11 @@ import com.yupic.yupic.R
 import com.yupic.yupic.model.Activity
 
 @Composable
-fun HomeScreen (){
+fun HomeScreen (onOffsetClicked : () -> Unit){
     BoxWithConstraints(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .padding(horizontal = 8.dp, vertical = 48.dp)
+            .fillMaxSize()
     ){
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -38,9 +41,9 @@ fun HomeScreen (){
             Button(
                 modifier = Modifier
                     .padding(4.dp),
-                onClick = { /*TODO*/ }
+                onClick = { onOffsetClicked() }
             ) {
-                Text(text = "Compensar")
+                Text(text = "COMPENSAR")
             }
             ActivitiesListPresenter(activities = listOf())
         }
@@ -52,7 +55,7 @@ fun HomeScreen (){
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen {}
 }
 
 @Composable
@@ -82,7 +85,8 @@ fun CircularProgressBar(
     
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(radius * 2f)
+        modifier = Modifier
+            .size(radius * 2f)
             .padding(8.dp)
     ){
         Canvas(modifier = Modifier.size(radius * 2f)){
@@ -144,7 +148,8 @@ fun ActivitiesListPresenter(activities : List<Activity>) {
     Text(
         text = "Activities",
         modifier = Modifier
-            .padding(4.dp)
+            .padding(4.dp),
+        style = MaterialTheme.typography.h5
     )
 
     if (activities.isNotEmpty()){

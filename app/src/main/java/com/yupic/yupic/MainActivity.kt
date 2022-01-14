@@ -95,7 +95,7 @@ fun YupicNavHost(navHostController: NavHostController, bottomBarState: MutableSt
             bottomBarState.value = false
         }
         composable(route=BottomNavigationItem.Home.route){
-            HomeScreen()
+            HomeScreen { navHostController.navigate(BottomNavigationItem.Offset.route) }
             // show BottomBar
             bottomBarState.value = true
         }
@@ -141,8 +141,8 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
                             )
                         },
                         label = { Text(text = item.title) },
-                        selectedContentColor = MaterialTheme.colors.onSurface,
-                        unselectedContentColor = MaterialTheme.colors.error,
+                        selectedContentColor = MaterialTheme.colors.onSecondary,
+                        unselectedContentColor = MaterialTheme.colors.onPrimary,
                         alwaysShowLabel = true,
                         selected = currentRoute == item.route,
                         onClick = {

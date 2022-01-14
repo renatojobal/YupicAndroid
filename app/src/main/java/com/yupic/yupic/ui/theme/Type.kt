@@ -10,29 +10,13 @@ import com.yupic.yupic.R
 
 // Set of Material typography styles to start with
 
-val fonts = FontFamily(
+val Comfortaa = FontFamily(
     Font(R.font.comfortaa),
     Font(R.font.comfortaa_bold, FontWeight.Bold),
     Font(R.font.comfortaa_light, FontWeight.Light)
 )
 
 val Typography = Typography(
-    body1 = TextStyle(
-        fontFamily = fonts,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
-    ),
-
-    button = TextStyle(
-        fontFamily = fonts,
-        fontWeight = FontWeight.W500,
-        fontSize = 14.sp
-    ),
-
-    caption = TextStyle(
-        fontFamily = fonts,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp
-    )
+    defaultFontFamily = Comfortaa
 
 )
