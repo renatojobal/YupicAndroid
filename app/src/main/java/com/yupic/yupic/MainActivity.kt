@@ -28,13 +28,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.yupic.yupic.ui.BottomNavigationItem
 import com.yupic.yupic.ui.login.LoginScreen
 
 
 class MainActivity : ComponentActivity() {
 
-
+    @ExperimentalPagerApi
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
 }
 
+@ExperimentalPagerApi
 @ExperimentalAnimationApi
 @Composable
 fun YupicApp(){
@@ -82,6 +84,7 @@ fun isUserLogged(): Boolean {
     return false
 }
 
+@ExperimentalPagerApi
 @Composable
 fun YupicNavHost(navHostController: NavHostController, bottomBarState: MutableState<Boolean>) {
     NavHost(navController = navHostController,

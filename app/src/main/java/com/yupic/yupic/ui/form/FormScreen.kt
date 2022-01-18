@@ -13,34 +13,45 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
 import com.yupic.yupic.model.Node
 
+@ExperimentalPagerApi
 @Composable
 fun FormScreen() {
     BoxWithConstraints(
-        modifier = Modifier.fillMaxSize()
-        .padding(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        QuestionCard(
-            Node(
-                title = "¿Qué tipo de transporte usas?",
-                weight = 0.0,
-                nestedNodes = listOf(
-                    Node(
-                        "Carro",
-                        weight = 2.0
-                    ),
-                    Node(
-                        "Transporte público",
-                        weight = 1.0
-                    ),
-                    Node(
-                        "Tren",
-                        weight = 2.0
+        
+        HorizontalPager(
+            count = 6,
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) { page ->
+             QuestionCard(
+                        Node(
+                            title = "¿Qué tipo de transporte usas?",
+                            weight = 0.0,
+                            nestedNodes = listOf(
+                                Node(
+                                    "Carro",
+                                    weight = 2.0
+                                ),
+                                Node(
+                                    "Transporte público",
+                                    weight = 1.0
+                                ),
+                                Node(
+                                    "Tren",
+                                    weight = 2.0
+                                )
+                            )
+                        )
                     )
-                )
-            )
-        )
+        }
+
     }
 
 }
@@ -50,7 +61,10 @@ fun QuestionCard(node: Node) {
     BoxWithConstraints (
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colors.primaryVariant, shape = MaterialTheme.shapes.small)
+            .background(
+                color = MaterialTheme.colors.primaryVariant,
+                shape = MaterialTheme.shapes.small
+            )
             .padding(horizontal = 8.dp, vertical = 24.dp)
             )
     {
@@ -96,6 +110,7 @@ fun SingleSelectableItem(node: Node) {
 }
 
 
+@ExperimentalPagerApi
 @Preview(showBackground = true)
 @Composable
 fun FormScreenPreview() {
