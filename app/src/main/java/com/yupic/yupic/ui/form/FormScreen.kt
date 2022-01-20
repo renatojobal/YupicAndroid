@@ -1,4 +1,4 @@
-package com.yupic.yupic.ui
+package com.yupic.yupic.ui.form
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

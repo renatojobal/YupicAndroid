@@ -16,9 +16,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.yupic.yupic.ui.FormScreen
+import com.yupic.yupic.ui.form.FormScreen
 import com.yupic.yupic.ui.HomeScreen
-import com.yupic.yupic.ui.OffsetScreen
+import com.yupic.yupic.ui.offset.OffsetScreen
 import com.yupic.yupic.ui.theme.YupicTheme
 
 import androidx.compose.material.*
@@ -35,6 +35,7 @@ import com.yupic.yupic.ui.login.LoginScreen
 
 class MainActivity : ComponentActivity() {
 
+    @ExperimentalMaterialApi
     @ExperimentalPagerApi
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +48,7 @@ class MainActivity : ComponentActivity() {
 
 }
 
+@ExperimentalMaterialApi
 @ExperimentalPagerApi
 @ExperimentalAnimationApi
 @Composable
@@ -84,6 +86,7 @@ fun isUserLogged(): Boolean {
     return false
 }
 
+@ExperimentalMaterialApi
 @ExperimentalPagerApi
 @Composable
 fun YupicNavHost(navHostController: NavHostController, bottomBarState: MutableState<Boolean>) {
