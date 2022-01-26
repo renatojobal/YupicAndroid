@@ -3,6 +3,7 @@ package com.yupic.yupic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInVertically
@@ -35,13 +36,17 @@ import com.yupic.yupic.ui.login.LoginScreen
 
 class MainActivity : ComponentActivity() {
 
+    // View model
+    private val sharedViewModel : SharedViewModel by viewModels()
+
+
     @ExperimentalMaterialApi
     @ExperimentalPagerApi
     @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            YupicApp()
+            YupicAppCompose(sharedViewModel)
         }
     }
 
@@ -52,7 +57,7 @@ class MainActivity : ComponentActivity() {
 @ExperimentalPagerApi
 @ExperimentalAnimationApi
 @Composable
-fun YupicApp(){
+fun YupicAppCompose(sharedViewModel: SharedViewModel){
     YupicTheme{
 
         val navController = rememberNavController()
@@ -72,7 +77,9 @@ fun YupicApp(){
             }
         )
         {
-            YupicNavHost(navHostController = navController, bottomBarState = bottomBarState)
+            YupicNavHost(navHostController = navController,
+                bottomBarState = bottomBarState,
+                sharedViewModel = sharedViewModel)
         }
 
 
@@ -89,7 +96,10 @@ fun isUserLogged(): Boolean {
 @ExperimentalMaterialApi
 @ExperimentalPagerApi
 @Composable
-fun YupicNavHost(navHostController: NavHostController, bottomBarState: MutableState<Boolean>) {
+fun YupicNavHost(
+    navHostController: NavHostController,
+    bottomBarState: MutableState<Boolean>,
+    sharedViewModel: SharedViewModel) {
     NavHost(navController = navHostController,
         modifier = Modifier.fillMaxSize(),
         startDestination = "login"){
@@ -111,7 +121,7 @@ fun YupicNavHost(navHostController: NavHostController, bottomBarState: MutableSt
             bottomBarState.value = true
         }
         composable(route=BottomNavigationItem.Offset.route){
-            OffsetScreen()
+            OffsetScreen(sharedViewModel = sharedViewModel)
             // show BottomBar
             bottomBarState.value = true
         }

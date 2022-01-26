@@ -2,6 +2,8 @@ package com.yupic.yupic.ui.form
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -10,12 +12,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.yupic.yupic.model.Node
+import com.yupic.yupic.ui.theme.YupicTheme
 
 @ExperimentalPagerApi
 @Composable
@@ -60,25 +64,55 @@ fun FormScreen() {
 fun QuestionCard(node: Node) {
     BoxWithConstraints (
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .background(
-                color = MaterialTheme.colors.primaryVariant,
+                color = Color.Transparent,
                 shape = MaterialTheme.shapes.small
             )
-            .padding(horizontal = 8.dp, vertical = 24.dp)
-            )
+            .padding(horizontal = 0.dp, vertical = 24.dp)
+    )
     {
-        Column {
-            Text(
-                text = node.title,
-                style = MaterialTheme.typography.h5,
-                modifier = Modifier.padding(vertical = 8.dp),
-                textAlign = TextAlign.Center
-            )
-            node.nestedNodes.forEach { targetNode ->
-                SingleSelectableItem(targetNode)
+        BoxWithConstraints (
+            modifier = Modifier
+                .padding(top = 5.dp)
+                .background(
+                    color = MaterialTheme.colors.secondary
+                )
+            
+                ){
+
+            Box ()
+            {
+                Box(
+                    modifier = Modifier
+                        .size(50.dp, 50.dp)
+                        .background(
+                            color = MaterialTheme.colors.onPrimary,
+                            shape = RoundedCornerShape(percent = 100)
+                        )
+                )
+                Card {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 50.dp)
+                    ) {
+                        Text(
+                            text = node.title,
+                            style = MaterialTheme.typography.h5,
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            textAlign = TextAlign.Center
+                        )
+                        node.nestedNodes.forEach { targetNode ->
+                            SingleSelectableItem(targetNode)
+                        }
+                    }
+                }
+
             }
+
+
         }
+     
     }
 }
 
@@ -114,30 +148,37 @@ fun SingleSelectableItem(node: Node) {
 @Preview(showBackground = true)
 @Composable
 fun FormScreenPreview() {
-    FormScreen()
+    YupicTheme {
+        FormScreen()
+    }
+
 }
 
 @Preview(showBackground = true)
 @Composable
 fun QuestionCardPreview() {
-    QuestionCard(
-        Node(
-            title = "¿Qué tipo de transporte usas?",
-            weight = 0.0,
-            nestedNodes = listOf(
-                Node(
-                    "Carro",
-                    weight = 2.0
-                ),
-                Node(
-                    "Transporte público",
-                    weight = 1.0
-                ),
-                Node(
-                    "Tren",
-                    weight = 2.0
+    YupicTheme {
+        QuestionCard(
+            Node(
+                title = "¿Qué tipo de transporte usas?",
+                weight = 0.0,
+                nestedNodes = listOf(
+                    Node(
+                        "Carro",
+                        weight = 2.0
+                    ),
+                    Node(
+                        "Transporte público",
+                        weight = 1.0
+                    ),
+                    Node(
+                        "Tren",
+                        weight = 2.0
+                    )
                 )
             )
         )
-    )
+    }
+
+
 }

@@ -86,4 +86,11 @@ dependencies {
     /** Pallet Api for get colors of images */
     implementation("androidx.palette:palette-ktx:1.0.0")
 
+    /** Retrofit */
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    /** Timber */
+    implementation "com.jakewharton.timber:timber:$timber_version"
+
 }

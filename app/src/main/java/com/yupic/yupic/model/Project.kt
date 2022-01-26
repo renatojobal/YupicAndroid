@@ -1,7 +1,8 @@
 package com.yupic.yupic.model
 
 data class Project(
-    val title : String,
+    val name : String,
     val description: String,
-    var image : String? = null
+    var thumnail : String? = null,
+    var kgPerDollar : Float = 0f
 )

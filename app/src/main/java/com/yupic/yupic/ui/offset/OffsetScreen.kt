@@ -11,9 +11,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -22,38 +20,23 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yupic.yupic.model.Project
-import java.util.*
 import com.yupic.yupic.R
+import com.yupic.yupic.SharedViewModel
 import com.yupic.yupic.ui.theme.YupicTheme
 
 @ExperimentalMaterialApi
 @Composable
-fun OffsetScreen() {
-    val list = listOf(
-        Project(
-            title= "TEAMTREES",
-            "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
-        ),
-        Project(
-            title= "TEAMTREES",
-            "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
-        ),
-        Project(
-            title= "TEAMTREES",
-            "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
-        ),
-        Project(
-            title= "TEAMTREES",
-            "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
-        )
-    )
+fun OffsetScreen(sharedViewModel: SharedViewModel) {
+    val list = sharedViewModel.getProjectsListLiveData().value
 
     LazyColumn{
-        items(items = list, itemContent = {item ->
+        if (list != null) {
+            items(items = list.toList(), itemContent = {item ->
 
-            ProjectCard(project = item)
+                ProjectCard(project = item)
 
-        })
+            })
+        }
 
 
     }
@@ -66,19 +49,19 @@ fun OffsetScreenPreview() {
 
     val list = listOf(
         Project(
-            title= "TEAMTREES",
+            name= "TEAMTREES",
             "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
         ),
         Project(
-            title= "TEAMTREES",
+            name= "TEAMTREES",
             "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
         ),
         Project(
-            title= "TEAMTREES",
+            name= "TEAMTREES",
             "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
         ),
         Project(
-            title= "TEAMTREES",
+            name= "TEAMTREES",
             "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
         )
     )
@@ -118,7 +101,7 @@ fun ProjectCard(
                     .weight(11f)
                     .padding(10.dp)
             ) {
-                Text(text = project.title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = project.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = project.description, maxLines = 4, overflow = TextOverflow.Ellipsis)
             }
             Box(modifier = Modifier
@@ -162,7 +145,7 @@ fun ProjectCardPreview() {
     YupicTheme {
         ProjectCard(
             Project(
-                title = "TEAMTREES",
+                name = "TEAMTREES",
                 "Team Trees, stylized as #TEAMTREES, is a collaborative fundraiser that raised 20 million U.S. dollars before 2020 to plant 20 million trees. The initiative was started by American YouTubers MrBeast and Mark Rober"
             )
         )
