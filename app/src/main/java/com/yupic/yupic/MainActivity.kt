@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -368,8 +369,8 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
                             )
                         },
                         label = { Text(text = item.title) },
-                        selectedContentColor = MaterialTheme.colors.onSecondary,
-                        unselectedContentColor = MaterialTheme.colors.onPrimary,
+                        selectedContentColor = MaterialTheme.colors.onPrimary,
+                        unselectedContentColor = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.disabled),
                         alwaysShowLabel = true,
                         selected = currentRoute == item.route,
                         onClick = {

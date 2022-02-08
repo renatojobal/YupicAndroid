@@ -11,6 +11,7 @@ private val DarkColorPalette = darkColors(
     primary = ColorE,
     primaryVariant = ColorD,
     secondary = ColorB,
+    secondaryVariant = ColorC,
     background = ColorD,
     surface = ColorF,
     onPrimary = Color.White,
@@ -37,7 +38,7 @@ private val LightColorPalette = lightColors(
 @Composable
 fun YupicTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable() () -> Unit) {
     val colors = if (darkTheme) {
-        LightColorPalette
+        DarkColorPalette
     } else {
         LightColorPalette
     }
