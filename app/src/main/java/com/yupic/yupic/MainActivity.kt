@@ -15,13 +15,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,7 +57,7 @@ import timber.log.Timber
 class MainActivity : ComponentActivity() {
 
     // View model
-    private val sharedViewModel : SharedViewModel by viewModels()
+    private val sharedViewModel: SharedViewModel by viewModels()
 
     // [START declare_auth]
     private lateinit var auth: FirebaseAuth
@@ -66,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
 
-    private var currentUser : FirebaseUser? = null
+    private var currentUser: FirebaseUser? = null
 
     @ExperimentalMaterialApi
     @ExperimentalPagerApi
@@ -89,11 +88,11 @@ class MainActivity : ComponentActivity() {
         auth = Firebase.auth
         // [END initialize_auth]
         setContent {
-            YupicAppCompose() { signIn() }
+            YupicAppCompose { signIn() }
         }
     }
 
-    override fun onStart(){
+    override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         currentUser = auth.currentUser
@@ -112,11 +111,13 @@ class MainActivity : ComponentActivity() {
                 val account = task.getResult(ApiException::class.java)!!
                 Timber.d("firebaseAuthWithGoogle:%s", account.id)
                 firebaseAuthWithGoogle(account.idToken!!)
-                sharedViewModel.loginUser(User(
-                    name = account.displayName ?: "Anonymus",
-                    mail = account.email ?: "",
-                    carbonFootprint = 4813.45
-                ))
+                sharedViewModel.loginUser(
+                    User(
+                        name = account.displayName ?: "Anonymus",
+                        mail = account.email ?: "",
+                        carbonFootprint = 4813.45
+                    )
+                )
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
                 Timber.w(e, "Google sign in failed")
@@ -151,16 +152,19 @@ class MainActivity : ComponentActivity() {
     }
     // [END signin]
 
-    @OptIn(ExperimentalMaterialApi::class, com.google.accompanist.pager.ExperimentalPagerApi::class,
+    @OptIn(
+        ExperimentalMaterialApi::class, com.google.accompanist.pager.ExperimentalPagerApi::class,
         androidx.compose.animation.ExperimentalAnimationApi::class
     )
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
-            sharedViewModel.loginUser(User(
-                name = user.displayName ?: "Anonymus",
-                mail = user.email ?: "",
-                carbonFootprint = 4813.45
-            ))
+            sharedViewModel.loginUser(
+                User(
+                    name = user.displayName ?: "Anonymus",
+                    mail = user.email ?: "",
+                    carbonFootprint = 4813.45
+                )
+            )
         }
 
     }
@@ -173,42 +177,103 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
-
-
 @ExperimentalMaterialApi
 @ExperimentalPagerApi
 @ExperimentalAnimationApi
 @Composable
-fun YupicAppCompose(signIn: () -> Unit){
-    YupicTheme{
+fun YupicAppCompose(signIn: () -> Unit) {
+    YupicTheme {
 
         val navController = rememberNavController()
         val backStackEntry = navController.currentBackStackEntryAsState()
         // State of bottomBar, set state to false, if current page route is "car_details"
-        val bottomBarState = rememberSaveable {(mutableStateOf(true))}
+        val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
 
 
+        val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
+        val scope = rememberCoroutineScope()
 
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
+        val sharedViewModel = viewModel<SharedViewModel>()
 
-        Scaffold(
-            topBar = {
-                AppTopBar({})
-            },
-            bottomBar = {
+        val user by sharedViewModel.user.observeAsState()
+
+        BottomDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(36.dp)
+                ) {
+                    ConstraintLayout(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        val (_, close) = createRefs()
+                        val (_, options) = createRefs()
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                }
+                            },
+                            modifier = Modifier
+                                .constrainAs(close) {
+                                    top.linkTo(parent.top)
+                                    end.linkTo(parent.end)
+
+                                }
+                        ) {
+                            Icon(Icons.Filled.Close, "Close")
+                        }
+                        Column(
+                            modifier = Modifier
+                                .constrainAs(options) {
+                                    top.linkTo(close.bottom)
+                                    width = Dimension.fillToConstraints
+
+                                }
+                        ) {
+                            Button(onClick = {
+                                sharedViewModel.logoutUser()
+                                scope.launch {
+                                    drawerState.close()
+                                }
+                            }) {
+                                Text(text = "Cerrar sesión")
+                            }
+                        }
+                    }
+
+                }
+            }
+        ) {
+
+            Scaffold(
+                topBar = {
+                    user?.run {
+                        AppTopBar {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }
+                    }
+                },
+                bottomBar = {
 
                     BottomBar(
                         navController = navController,
                         bottomBarState = bottomBarState
                     )
 
+                }
+            )
+            {
+                YupicNavHost(
+                    navHostController = navController,
+                    bottomBarState = bottomBarState
+                ) { signIn() }
             }
-        )
-        {
-            YupicNavHost(navHostController = navController,
-                bottomBarState = bottomBarState
-            ) { signIn() }
+
         }
 
 
@@ -238,31 +303,33 @@ fun YupicNavHost(
 
     val startDestination = if (user != null) {
         "home"
-    }else{
+    } else {
         "login"
     }
 
-    NavHost(navController = navHostController,
+    NavHost(
+        navController = navHostController,
         modifier = Modifier.fillMaxSize(),
-        startDestination = startDestination){
-        composable(route="login"){
-            LoginScreen{
+        startDestination = startDestination
+    ) {
+        composable(route = "login") {
+            LoginScreen {
                 signIn()
             }
             // show BottomBar
             bottomBarState.value = false
         }
-        composable(route=BottomNavigationItem.Home.route){
+        composable(route = BottomNavigationItem.Home.route) {
             HomeScreen { navHostController.navigate(BottomNavigationItem.Offset.route) }
             // show BottomBar
             bottomBarState.value = true
         }
-        composable(route=BottomNavigationItem.Form.route){
+        composable(route = BottomNavigationItem.Form.route) {
             FormScreen()
             // show BottomBar
             bottomBarState.value = true
         }
-        composable(route=BottomNavigationItem.Offset.route){
+        composable(route = BottomNavigationItem.Offset.route) {
             OffsetScreen(sharedViewModel = sharedViewModel)
             // show BottomBar
             bottomBarState.value = true
@@ -292,7 +359,7 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
         content = {
 
             BottomNavigation {
-                items.forEach {item ->
+                items.forEach { item ->
                     BottomNavigationItem(
                         icon = {
                             Icon(
@@ -334,26 +401,26 @@ fun BottomBar(navController: NavController, bottomBarState: MutableState<Boolean
 }
 
 @Composable
-fun AppTopBar(onClick : () -> Unit) {
+fun AppTopBar(onClick: () -> Unit) {
     TopAppBar(
         elevation = 10.dp,
     ) {
         ConstraintLayout(
             modifier = Modifier.fillMaxWidth()
-        ){
-            val (title, search) = createRefs()
+        ) {
+            val (title, menu) = createRefs()
             IconButton(
                 onClick = {
-                        onClick()
+                    onClick()
                 },
                 modifier = Modifier
-                    .constrainAs(search) {
+                    .constrainAs(menu) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
                     }
             ) {
-                Icon(Icons.Filled.Menu,"Menu")
+                Icon(Icons.Filled.Menu, "Menu")
             }
         }
     }
@@ -363,44 +430,13 @@ fun AppTopBar(onClick : () -> Unit) {
 @ExperimentalPagerApi
 @ExperimentalAnimationApi
 @Composable
-fun ModalDrawerSample(content : @Composable () -> Unit) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+fun ModalDrawerSample(content: @Composable () -> Unit) {
 
-    ModalDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            Column {
-                Text("Text in Drawer")
-                Button(onClick = {
-                    scope.launch {
-                        drawerState.close()
-                    }
-                }) {
-                    Text("Close Drawer")
-                }
-            }
-        },
-        content = {
-            Column {
-                Text("Text in Bodycontext")
-                Button(onClick = {
-
-                    scope.launch {
-                        drawerState.open()
-                    }
-
-                }) {
-                    Text("Click to open")
-                }
-            }
-        }
-    )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TopBarPreview(){
+fun TopBarPreview() {
     AppTopBar({})
 }
 
