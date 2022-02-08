@@ -426,18 +426,11 @@ fun AppTopBar(onClick: () -> Unit) {
     }
 }
 
-@ExperimentalMaterialApi
-@ExperimentalPagerApi
-@ExperimentalAnimationApi
-@Composable
-fun ModalDrawerSample(content: @Composable () -> Unit) {
-
-}
 
 @Preview(showBackground = true)
 @Composable
 fun TopBarPreview() {
-    AppTopBar({})
+    AppTopBar {}
 }
 
 

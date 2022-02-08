@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,7 +23,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.yupic.yupic.R
-import com.yupic.yupic.model.Activity
+import com.yupic.yupic.model.Category
 
 @Composable
 fun HomeScreen (onOffsetClicked : () -> Unit){
@@ -45,7 +44,7 @@ fun HomeScreen (onOffsetClicked : () -> Unit){
             ) {
                 Text(text = "COMPENSAR")
             }
-            ActivitiesListPresenter(activities = listOf())
+            ActivitiesListPresenter(categories = listOf())
         }
 
     }
@@ -117,7 +116,7 @@ fun CircularProgressPreview() {
 
 @Composable
 fun ActivityItem(
-    activity: Activity
+    category: Category
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row (
@@ -127,9 +126,9 @@ fun ActivityItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ){
-            Icon(painterResource(id = activity.iconResource), contentDescription = activity.title)
-            Text(text = activity.title)
-            Text(text = (activity.percentage * 100).toInt().toString())
+            Icon(painterResource(id = category.iconResource), contentDescription = category.title)
+            Text(text = category.title)
+            Text(text = (category.percentage * 100).toInt().toString())
         }
     }
 
@@ -138,13 +137,13 @@ fun ActivityItem(
 @Preview(showBackground = true)
 @Composable
 fun ActivityItemPreview() {
-    val dummyActivity = Activity(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    val dummyActivity = Category(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
     ActivityItem(dummyActivity)
 }
 
 
 @Composable
-fun ActivitiesListPresenter(activities : List<Activity>) {
+fun ActivitiesListPresenter(categories : List<Category>) {
     Text(
         text = "Activities",
         modifier = Modifier
@@ -152,10 +151,10 @@ fun ActivitiesListPresenter(activities : List<Activity>) {
         style = MaterialTheme.typography.h5
     )
 
-    if (activities.isNotEmpty()){
+    if (categories.isNotEmpty()){
         LazyColumn{
-            items(activities.size){index ->
-                ActivityItem(activity = activities[index])
+            items(categories.size){ index ->
+                ActivityItem(category = categories[index])
             }
         }
     }else{
@@ -169,8 +168,8 @@ fun ActivitiesListPresenter(activities : List<Activity>) {
 @Preview(showBackground = true)
 @Composable
 fun ActivitiesListPreview() {
-    val dummyActivity1 = Activity(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
-    val dummyActivity2 = Activity(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    val dummyActivity1 = Category(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    val dummyActivity2 = Category(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
     ActivitiesListPresenter(listOf(dummyActivity1, dummyActivity2))
 }
 
