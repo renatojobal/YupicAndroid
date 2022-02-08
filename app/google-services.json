@@ -1,24 +1,25 @@
 {
   "project_info": {
     "project_number": "492265583429",
+    "firebase_url": "https://yupic-yupic-default-rtdb.firebaseio.com",
     "project_id": "yupic-yupic",
     "storage_bucket": "yupic-yupic.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:492265583429:android:b3da367d24d37f91e4442c",
+        "mobilesdk_app_id": "1:492265583429:android:f27550f8d03911b9e4442c",
         "android_client_info": {
-          "package_name": "com.yupi.yupic"
+          "package_name": "com.yupic.yupic"
         }
       },
       "oauth_client": [
         {
-          "client_id": "492265583429-9ntvj86le3b073n3glm2qjuni1j3qk9b.apps.googleusercontent.com",
+          "client_id": "492265583429-g80kk3u4gbft0g9vslltguie556kpni0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.yupi.yupic",
-            "certificate_hash": "79a903afa2c6eee7b05b4e463b03d07b1c3640ee"
+            "package_name": "com.yupic.yupic",
+            "certificate_hash": "eaa9fa151ee0c7d88251ded5854a57b93e196498"
           }
         },
         {

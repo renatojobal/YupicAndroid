@@ -2,6 +2,7 @@ package com.yupic.yupic.timber
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import timber.log.Timber
 
 
@@ -31,7 +32,7 @@ class ReleaseTree : Timber.Tree() {
         if (isLoggable(tag, priority)) {
 
             // Report caught exception to your crash library
-           // FirebaseCrashlytics.getInstance().log(tag + message + t?.message)
+            FirebaseCrashlytics.getInstance().log(tag + message + t?.message)
 
             // If message is short enough
             if (message.length < MAX_LOG_LENGTH) {

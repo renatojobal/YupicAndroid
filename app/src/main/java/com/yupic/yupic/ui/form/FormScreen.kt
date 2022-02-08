@@ -2,7 +2,6 @@ package com.yupic.yupic.ui.form
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.MaterialTheme
@@ -12,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,31 +27,22 @@ fun FormScreen() {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        
+
         HorizontalPager(
             count = 6,
             contentPadding = PaddingValues(horizontal = 16.dp)
         ) { page ->
-             QuestionCard(
-                        Node(
-                            title = "¿Qué tipo de transporte usas?",
-                            weight = 0.0,
-                            nestedNodes = listOf(
-                                Node(
-                                    "Carro",
-                                    weight = 2.0
-                                ),
-                                Node(
-                                    "Transporte público",
-                                    weight = 1.0
-                                ),
-                                Node(
-                                    "Tren",
-                                    weight = 2.0
-                                )
-                            )
-                        )
+            QuestionCard(
+                Node(
+                    title = "¿Qué tipo de transporte usas?",
+                    subtitle = "¿Qúe tipo de vehículo usa?",
+                    factor = 10.0,
+                    type = "multipleChoice",
+                    options = hashMapOf(
+                        "title" to "Name"
                     )
+                )
+            )
         }
 
     }
@@ -62,36 +51,40 @@ fun FormScreen() {
 
 @Composable
 fun QuestionCard(node: Node) {
-    BoxWithConstraints (
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                color = Color.Transparent,
+                color = MaterialTheme.colors.surface,
                 shape = MaterialTheme.shapes.small
             )
             .padding(horizontal = 0.dp, vertical = 24.dp)
     )
     {
-        BoxWithConstraints (
+        BoxWithConstraints(
             modifier = Modifier
                 .padding(top = 5.dp)
                 .background(
-                    color = MaterialTheme.colors.secondary
+                    color = MaterialTheme.colors.surface,
+                    shape = MaterialTheme.shapes.small
                 )
-            
-                ){
 
-            Box ()
+        ) {
+
+            Box()
             {
                 Box(
                     modifier = Modifier
                         .size(50.dp, 50.dp)
                         .background(
-                            color = MaterialTheme.colors.onPrimary,
-                            shape = RoundedCornerShape(percent = 100)
+                            color = MaterialTheme.colors.surface,
+                            shape = MaterialTheme.shapes.small
                         )
                 )
-                Card {
+                Card(
+                    modifier = Modifier.padding(horizontal = 18.dp),
+                    backgroundColor = MaterialTheme.colors.primaryVariant
+                ) {
                     Column(
                         modifier = Modifier
                             .padding(top = 50.dp)
@@ -102,9 +95,9 @@ fun QuestionCard(node: Node) {
                             modifier = Modifier.padding(vertical = 8.dp),
                             textAlign = TextAlign.Center
                         )
-                        node.nestedNodes.forEach { targetNode ->
-                            SingleSelectableItem(targetNode)
-                        }
+//                        node.nestedNodes.forEach { targetNode ->
+//                            SingleSelectableItem(targetNode)
+//                        }
                     }
                 }
 
@@ -112,7 +105,7 @@ fun QuestionCard(node: Node) {
 
 
         }
-     
+
     }
 }
 
@@ -136,7 +129,7 @@ fun SingleSelectableItem(node: Node) {
         ) {
             Text(
                 text = node.title,
-            style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.body1
             )
             Checkbox(checked = isChecked.value, onCheckedChange = { isChecked.value = it })
         }
@@ -160,21 +153,12 @@ fun QuestionCardPreview() {
     YupicTheme {
         QuestionCard(
             Node(
-                title = "¿Qué tipo de transporte usas?",
-                weight = 0.0,
-                nestedNodes = listOf(
-                    Node(
-                        "Carro",
-                        weight = 2.0
-                    ),
-                    Node(
-                        "Transporte público",
-                        weight = 1.0
-                    ),
-                    Node(
-                        "Tren",
-                        weight = 2.0
-                    )
+                title = "Transporte",
+                subtitle = "¿Qúe tipo de vehículo usa?",
+                factor = 10.0,
+                type = "multipleChoice",
+                options = hashMapOf(
+                    "title" to "Name"
                 )
             )
         )

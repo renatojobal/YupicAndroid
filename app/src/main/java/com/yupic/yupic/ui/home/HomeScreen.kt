@@ -37,7 +37,7 @@ fun HomeScreen (onOffsetClicked : () -> Unit){
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            CircularProgressBar(percentage = 0.8f, number = 100)
+            CircularProgressBar(percentage = 0.46546f, number = 100)
             Button(
                 modifier = Modifier
                     .padding(4.dp),

@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yupic.yupic.R
+import com.yupic.yupic.ui.theme.YupicTheme
 
 @Composable
 fun LoginScreen(onLoggedSuccess: () -> Unit) {
@@ -38,30 +39,14 @@ fun LoginScreen(onLoggedSuccess: () -> Unit) {
             val modifierButton = Modifier
                 .padding(horizontal = 40.dp, vertical = 8.dp)
                 .fillMaxWidth()
-            Button(
-                modifier = modifierButton,
-                onClick = {
-                onLoggedSuccess()
-            }) {
-                Text(text = "LOGIN WITH FACEBOOK", style = MaterialTheme.typography.button)
-            }
+
             Button(modifier = modifierButton,onClick = {
                 onLoggedSuccess()
             }) {
                 Text(text = "LOGIN WITH GOOGLE", style = MaterialTheme.typography.button)
             }
 
-            Button(modifier = modifierButton,onClick = {
-                onLoggedSuccess()
-            }) {
-                Text(text = "LOGITN WITH UTPL", style = MaterialTheme.typography.button)
-            }
 
-            Button(modifier = modifierButton,onClick = {
-                onLoggedSuccess()
-            }) {
-                Text(text = "REGISTER", style = MaterialTheme.typography.button)
-            }
 
         }
         
@@ -71,5 +56,8 @@ fun LoginScreen(onLoggedSuccess: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen({})
+    YupicTheme {
+        LoginScreen({})
+    }
+
 }

@@ -11,6 +11,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -27,16 +28,19 @@ import com.yupic.yupic.ui.theme.YupicTheme
 @ExperimentalMaterialApi
 @Composable
 fun OffsetScreen(sharedViewModel: SharedViewModel) {
-    val list = sharedViewModel.getProjectsListLiveData().value
+    val list = sharedViewModel.projectsList.observeAsState()
 
     LazyColumn{
-        if (list != null) {
-            items(items = list.toList(), itemContent = {item ->
+        list.value?.let {
+
+            items(items = it, itemContent = {item ->
 
                 ProjectCard(project = item)
 
             })
+
         }
+
 
 
     }
@@ -124,7 +128,7 @@ fun ProjectCard(
                     painter = painterResource(R.drawable.team_trees_example),
                     "team trees icon",
                     modifier = Modifier
-                        .padding(start=30.dp)
+                        .padding(start = 30.dp)
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
