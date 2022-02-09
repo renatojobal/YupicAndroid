@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -115,15 +117,12 @@ fun QuestionCard(node: Node) {
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colors.secondaryVariant)
             ) {
-                Text(text = "\uD83D\uDD25")
+                Text(text = node.thumbnail ?: "\uD83D\uDD25")
             }
 
             Text(text = node.subtitle)
 
-
-
             if(node.type == NODE_TYPE_MULTIPLE_CHOICE){ // Present options
-                Timber.d("Option: $node")
                 LazyColumn{
                     node.options?.let {
                         items(items = it, itemContent = {item ->
@@ -137,7 +136,26 @@ fun QuestionCard(node: Node) {
                 }
 
             }else { // Present input text
-
+                var text by remember {
+                    mutableStateOf("")
+                }
+                Surface(modifier = Modifier
+                    .padding(top = 128.dp)
+                    .size(width = 64.dp, height = 64.dp)
+                ) {
+                    TextField(
+                        value = text,
+                        onValueChange = { value ->
+                            if (value.length <= 3) {
+                                text = value.filter { it.isDigit() }
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        ),
+                        textStyle = MaterialTheme.typography.h6
+                    )
+                }
             }
 
 
@@ -146,6 +164,8 @@ fun QuestionCard(node: Node) {
 
     }
 }
+
+
 
 @Composable
 fun SingleSelectableItem(option: Option, selectedValue : Option?,  onClickListener: (Option) -> Unit) {
