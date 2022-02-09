@@ -8,5 +8,5 @@ data class Node (
     var factor : Double = 0.0,
     val type : String = "",
     var result : Double = 0.0,
-    var options : List<Option>?
+    var options : List<Option>? = null
 )

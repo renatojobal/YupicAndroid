@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,10 +19,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.yupic.yupic.SharedViewModel
 import com.yupic.yupic.model.Node
 import com.yupic.yupic.model.Option
+import com.yupic.yupic.ui.NotFound
 import com.yupic.yupic.ui.offset.ProjectCard
 import com.yupic.yupic.ui.theme.YupicTheme
 import timber.log.Timber
@@ -34,33 +38,29 @@ fun FormScreen() {
             .fillMaxSize()
     ) {
 
-        HorizontalPager(
-            count = 6,
-            contentPadding = PaddingValues(horizontal = 24.dp)
-        ) { page ->
-            QuestionCard(
-                Node(
-                    title = "¿Qué tipo de transporte usas?",
-                    subtitle = "¿Qúe tipo de vehículo usa?",
-                    factor = 10.0,
-                    type = "multipleChoice",
-                    options = listOf(
-                        Option(
-                            title = "Menos de 100 metros cuadrados",
-                            value = 40.0
-                        ),
-                        Option(
-                            title = "Hasta de 150 metros cuadrados",
-                            value = 40.0
-                        ),
-                        Option(
-                            title = "Más de 150 metros cuadrados",
-                            value = 40.0
-                        )
+        val sharedViewModel = viewModel<SharedViewModel>()
+
+        val targetNodes = sharedViewModel.formNodes.observeAsState()
+
+        targetNodes.value?.let { fetchedNodes ->
+            if(fetchedNodes.isNotEmpty()){
+                HorizontalPager(
+                    count = fetchedNodes.size,
+                    contentPadding = PaddingValues(horizontal = 24.dp)
+                ) { page : Int ->
+                    QuestionCard(
+                        fetchedNodes[page]
                     )
-                )
-            )
+                }
+            }else{
+                NotFound()
+            }
+        } ?: run {
+            NotFound()
         }
+
+
+
 
     }
 
