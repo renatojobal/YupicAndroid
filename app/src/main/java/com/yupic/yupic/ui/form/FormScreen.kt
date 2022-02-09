@@ -25,6 +25,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.yupic.yupic.SharedViewModel
 import com.yupic.yupic.model.Node
 import com.yupic.yupic.model.Option
+import com.yupic.yupic.ui.NODE_TYPE_MULTIPLE_CHOICE
 import com.yupic.yupic.ui.NotFound
 import com.yupic.yupic.ui.offset.ProjectCard
 import com.yupic.yupic.ui.theme.YupicTheme
@@ -121,8 +122,8 @@ fun QuestionCard(node: Node) {
 
 
 
-            if(node.type == "multipleChoice"){ // Present options
-
+            if(node.type == NODE_TYPE_MULTIPLE_CHOICE){ // Present options
+                Timber.d("Option: $node")
                 LazyColumn{
                     node.options?.let {
                         items(items = it, itemContent = {item ->

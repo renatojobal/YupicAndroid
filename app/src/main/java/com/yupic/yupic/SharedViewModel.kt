@@ -76,8 +76,9 @@ class SharedViewModel(
                         val options = mutableListOf<Option>()
                         optionsData?.forEach {
                             val dummyOption = Option(it)
+                            options.add(dummyOption)
                         }
-
+                        node.options = options
                     }
 
 
