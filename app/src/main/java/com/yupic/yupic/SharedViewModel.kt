@@ -15,7 +15,7 @@ import com.yupic.yupic.ui.NODE_TYPE_MULTIPLE_CHOICE
 import com.yupic.yupic.ui.NODE_TYPE_NUMBER
 import retrofit2.Call
 import retrofit2.Callback
-
+import com.google.firebase.firestore.ktx.toObject
 import retrofit2.Response
 import timber.log.Timber
 import java.util.*
@@ -27,7 +27,6 @@ class SharedViewModel(
     private val database: FirebaseFirestore = Firebase.firestore
 ) : ViewModel() {
 
-
     private val _projectsList : MutableLiveData<List<Project>> = MutableLiveData(listOf())
     val projectsList: LiveData<List<Project>> = _projectsList
 
@@ -38,6 +37,7 @@ class SharedViewModel(
     val user : LiveData<User?> = _user
     fun loginUser(user: User){
         this._user.value = user
+        Timber.i("Logged user: ${this._user.value}")
     }
     fun logoutUser(){
         this._user.value = null
@@ -59,7 +59,7 @@ class SharedViewModel(
                 val nodes = mutableListOf<Node>()
                 Timber.i("Got result: ${result.documents}")
                 result.documents.forEach { docSnapshot ->
-                    Timber.d("Document: ${docSnapshot.data}")
+
                     val node = Node(
                         title = docSnapshot.getString("title") ?: "",
                     subtitle= docSnapshot.getString("subtitle") ?: "",
@@ -97,25 +97,40 @@ class SharedViewModel(
 
     private fun loadProjectList(){
 
-        val apiInterface = ApiInterface.create().getProjects()
-
-        apiInterface.enqueue(object : Callback<List<Project>>{
-            override fun onResponse(call: Call<List<Project>>, response: Response<List<Project>>) {
-                if(response.code() == 200){
-                    response.body()?.let { responseBody ->
-                        _projectsList.postValue(responseBody)
+        database.collection("projects")
+            .get()
+            .addOnSuccessListener { result ->
+                val projects = mutableListOf<Project>()
+                result.documents.forEach { docSnapshot ->
+                    val targetProject = docSnapshot.toObject<Project>()
+                    targetProject?.let {
+                        projects.add(targetProject)
                     }
-                }else{
-                    Timber.e("Error getting projects. Response code: ${response.code()} \n Response: $response")
+
                 }
+                _projectsList.value = projects
+
+            }
+            .addOnFailureListener {
+                Timber.e(it, "Error getting the projects")
             }
 
-            override fun onFailure(call: Call<List<Project>>, t: Throwable) {
-                Timber.e(t, "Failure getting projects")
-            }
+    }
 
-        })
+    /**
+     * Method calculate the carbon footprint
+     */
+    fun calculateFormResult(){
 
+        var totalResult = 0.0
+
+        _formNodes.value?.forEach {node ->
+            totalResult += node.calculateResult()
+        }
+        Timber.d("Current user: ${this._user.value}")
+        val dummyUser = _user.value?.copy(carbonFootprint = totalResult)
+        _user.value = dummyUser
+        Timber.i("Carbon footprint calculated: $totalResult")
     }
 
     init {

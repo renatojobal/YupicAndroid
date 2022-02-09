@@ -22,6 +22,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -159,6 +160,7 @@ class MainActivity : ComponentActivity() {
     )
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
+            Timber.i("User already signed in")
             sharedViewModel.loginUser(
                 User(
                     name = user.displayName ?: "Anonymus",
@@ -166,6 +168,8 @@ class MainActivity : ComponentActivity() {
                     carbonFootprint = 4813.45
                 )
             )
+        }else{
+            Timber.w("User is null")
         }
 
     }
@@ -194,7 +198,7 @@ fun YupicAppCompose(signIn: () -> Unit) {
         val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        val sharedViewModel = viewModel<SharedViewModel>()
+        val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
 
         val user by sharedViewModel.user.observeAsState()
 
@@ -298,7 +302,7 @@ fun YupicNavHost(
 ) {
 
     // User
-    val sharedViewModel = viewModel<SharedViewModel>()
+    val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
 
     val user by sharedViewModel.user.observeAsState()
 

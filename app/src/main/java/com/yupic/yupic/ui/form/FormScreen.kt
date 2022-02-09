@@ -1,5 +1,6 @@
 package com.yupic.yupic.ui.form
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -41,19 +43,28 @@ fun FormScreen() {
             .fillMaxSize()
     ) {
 
-        val sharedViewModel = viewModel<SharedViewModel>()
+        val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
 
         val targetNodes = sharedViewModel.formNodes.observeAsState()
 
         targetNodes.value?.let { fetchedNodes ->
             if(fetchedNodes.isNotEmpty()){
                 HorizontalPager(
-                    count = fetchedNodes.size,
+                    count = fetchedNodes.size + 1 , // The last page will show the submit button
                     contentPadding = PaddingValues(horizontal = 24.dp)
                 ) { page : Int ->
-                    QuestionCard(
-                        fetchedNodes[page]
-                    )
+
+                    if(page == fetchedNodes.size){ // If it is the last page show submit button
+                        SubmitButton {
+                            sharedViewModel.calculateFormResult()
+
+                        }
+                    } else { // Show normal question card
+                        QuestionCard(
+                            fetchedNodes[page]
+                        )
+                    }
+
                 }
             }else{
                 NotFound()
@@ -67,6 +78,30 @@ fun FormScreen() {
 
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SubmitButtonPreview() {
+    YupicTheme {
+        SubmitButton {}
+    }
+}
+
+@Composable
+fun SubmitButton(onSubmit : () -> Unit) {
+    BoxWithConstraints(modifier = Modifier
+        .fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Button(onClick = { onSubmit() }) {
+            Text(
+                text = "Calcular",
+                style = MaterialTheme.typography.button
+            )
+        }
+
+    }
 }
 
 @Composable

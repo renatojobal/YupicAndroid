@@ -105,8 +105,8 @@ fun ProjectCard(
                     .weight(11f)
                     .padding(10.dp)
             ) {
-                Text(text = project.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = project.description, maxLines = 4, overflow = TextOverflow.Ellipsis)
+                Text(text = project.name ?: "", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = project.description ?: "", maxLines = 4, overflow = TextOverflow.Ellipsis)
             }
             Box(modifier = Modifier
                 .weight(6f)

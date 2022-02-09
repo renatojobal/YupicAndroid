@@ -1,5 +1,6 @@
 package com.yupic.yupic.ui
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -10,11 +11,13 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,11 +25,19 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yupic.yupic.R
+import com.yupic.yupic.SharedViewModel
 import com.yupic.yupic.model.Category
+import timber.log.Timber
 
 @Composable
 fun HomeScreen (onOffsetClicked : () -> Unit){
+
+    val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
+    val user by sharedViewModel.user.observeAsState()
+
+
     BoxWithConstraints(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 48.dp)
@@ -36,7 +47,12 @@ fun HomeScreen (onOffsetClicked : () -> Unit){
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            CircularProgressBar(percentage = 0.46546f, number = 100)
+            val targetPercentage =  (user?.carbonFootprint?.toFloat()?.plus(50)) ?: 0f
+            Timber.d("TargetPercentage: $targetPercentage")
+            CircularProgressBar(
+                percentage = targetPercentage,
+                number = 100
+            )
             Button(
                 modifier = Modifier
                     .padding(4.dp),
