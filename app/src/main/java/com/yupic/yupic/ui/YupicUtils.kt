@@ -34,3 +34,8 @@ fun NotFoundPreview() {
 
 const val NODE_TYPE_MULTIPLE_CHOICE = "multipleChoice"
 const val NODE_TYPE_NUMBER = "number"
+const val EMOJI_DEFAULT = "\uD83C\uDFED"
+
+fun Double.trimDecimals() : String{
+    return String.format("%.0f", this)
+}

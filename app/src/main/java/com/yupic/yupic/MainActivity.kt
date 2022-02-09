@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
         auth = Firebase.auth
         // [END initialize_auth]
         setContent {
-            YupicAppCompose { signIn() }
+            YupicAppCompose(sharedViewModel) { signIn() }
         }
     }
 
@@ -186,7 +186,7 @@ class MainActivity : ComponentActivity() {
 @ExperimentalPagerApi
 @ExperimentalAnimationApi
 @Composable
-fun YupicAppCompose(signIn: () -> Unit) {
+fun YupicAppCompose(sharedViewModel: SharedViewModel, signIn: () -> Unit) {
     YupicTheme {
 
         val navController = rememberNavController()
@@ -198,7 +198,6 @@ fun YupicAppCompose(signIn: () -> Unit) {
         val drawerState = rememberBottomDrawerState(BottomDrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
 
         val user by sharedViewModel.user.observeAsState()
 
@@ -273,7 +272,7 @@ fun YupicAppCompose(signIn: () -> Unit) {
                 }
             )
             {
-                YupicNavHost(
+                YupicNavHost(sharedViewModel,
                     navHostController = navController,
                     bottomBarState = bottomBarState
                 ) { signIn() }
@@ -285,24 +284,17 @@ fun YupicAppCompose(signIn: () -> Unit) {
     }
 }
 
-/**
- *  Todo: Check her if the user is logged
- */
-fun isUserLogged(): Boolean {
-    return false
-}
 
 @ExperimentalMaterialApi
 @ExperimentalPagerApi
 @Composable
 fun YupicNavHost(
+    sharedViewModel: SharedViewModel,
     navHostController: NavHostController,
     bottomBarState: MutableState<Boolean>,
     signIn: () -> Unit
 ) {
 
-    // User
-    val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
 
     val user by sharedViewModel.user.observeAsState()
 
@@ -325,12 +317,12 @@ fun YupicNavHost(
             bottomBarState.value = false
         }
         composable(route = BottomNavigationItem.Home.route) {
-            HomeScreen { navHostController.navigate(BottomNavigationItem.Offset.route) }
+            HomeScreen(sharedViewModel) { navHostController.navigate(BottomNavigationItem.Offset.route) }
             // show BottomBar
             bottomBarState.value = true
         }
         composable(route = BottomNavigationItem.Form.route) {
-            FormScreen()
+            FormScreen(sharedViewModel)
             // show BottomBar
             bottomBarState.value = true
         }
@@ -435,13 +427,19 @@ fun AppTopBar(onClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun TopBarPreview() {
-    AppTopBar {}
+    YupicTheme {
+        AppTopBar {}
+    }
+
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun BottomNavBarPreview() {
-    // BottomNavigationBar()
+    YupicTheme {
+        // BottomAppBar()
+    }
+
 }
 

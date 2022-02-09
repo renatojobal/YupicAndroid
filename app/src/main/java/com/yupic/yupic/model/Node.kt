@@ -3,6 +3,7 @@ package com.yupic.yupic.model
 import com.yupic.yupic.ui.NODE_TYPE_MULTIPLE_CHOICE
 
 data class Node (
+    var key : String = "",
     val title: String = "",
     val subtitle: String = "",
     val thumbnail: String? = "",
@@ -10,7 +11,8 @@ data class Node (
     var factor : Double = 0.0,
     val type : String = "",
     var result : Double = 0.0,
-    var options : List<Option>? = null
+    var options : List<Option>? = null,
+    var category: Category? = null
 ){
 
     fun calculateResult (): Double{

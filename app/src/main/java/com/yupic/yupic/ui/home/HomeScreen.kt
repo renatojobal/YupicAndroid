@@ -7,7 +7,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -18,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -26,16 +24,15 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.yupic.yupic.R
 import com.yupic.yupic.SharedViewModel
 import com.yupic.yupic.model.Category
 import timber.log.Timber
 
 @Composable
-fun HomeScreen (onOffsetClicked : () -> Unit){
+fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
 
-    val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
     val user by sharedViewModel.user.observeAsState()
+    val selectedCategory by sharedViewModel.selectedCategory.observeAsState()
 
 
     BoxWithConstraints(
@@ -43,15 +40,19 @@ fun HomeScreen (onOffsetClicked : () -> Unit){
             .padding(horizontal = 8.dp, vertical = 48.dp)
             .fillMaxSize()
     ){
+
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            val targetPercentage =  (user?.carbonFootprint?.toFloat()?.plus(50)) ?: 0f
-            Timber.d("TargetPercentage: $targetPercentage")
+
+            Timber.d("TargetPercentage: ${selectedCategory?.percentage ?: 100.00}")
+            Timber.d("Hola")
             CircularProgressBar(
-                percentage = targetPercentage,
-                number = 100
+                percentage = selectedCategory?.percentage ?: 0.00,
+                suffix = " kg",
+                insideText = selectedCategory?.categoryCarbonFootprintKg?.trimDecimals() ?: "0"
             )
             Button(
                 modifier = Modifier
@@ -60,23 +61,24 @@ fun HomeScreen (onOffsetClicked : () -> Unit){
             ) {
                 Text(text = "COMPENSAR")
             }
-            ActivitiesListPresenter(categories = listOf())
+            ActivitiesListPresenter(sharedViewModel)
         }
 
     }
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen {}
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPreview() {
+//    HomeScreen {}
+//}
 
 @Composable
 fun CircularProgressBar(
-    percentage : Float = 0f,
-    number : Int,
+    percentage : Double = 0.0,
+    suffix : String = "",
+    insideText : String = percentage.toString(),
     fontSize: TextUnit = 28.sp,
     radius: Dp = 100.dp,
     color : Color = MaterialTheme.colors.onSurface,
@@ -88,7 +90,7 @@ fun CircularProgressBar(
         mutableStateOf(false)
     }
     val currentPercentage = animateFloatAsState(
-        targetValue = if (animationPlayed) percentage else 0f,
+        targetValue = (if (animationPlayed) percentage else 0.0).toFloat(),
         animationSpec = tween(
             durationMillis = animDuration,
             delayMillis = animDelay
@@ -114,7 +116,7 @@ fun CircularProgressBar(
             )
         }
         Text(
-            text = (currentPercentage.value * number).toInt().toString(),
+            text = insideText + suffix,
             color = MaterialTheme.colors.onSurface,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold
@@ -127,7 +129,7 @@ fun CircularProgressBar(
 @Preview(showBackground = true)
 @Composable
 fun CircularProgressPreview() {
-    CircularProgressBar(percentage = 0.8f, number = 100)
+    CircularProgressBar(percentage = 50.0)
 }
 
 @Composable
@@ -142,9 +144,9 @@ fun ActivityItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ){
-            Icon(painterResource(id = category.iconResource), contentDescription = category.title)
+            Text(text = category.thumbnail?: "\uD83C\uDFED")
             Text(text = category.title)
-            Text(text = (category.percentage * 100).toInt().toString())
+            Text(text = (category.percentage?.times(100))?.toInt().toString())
         }
     }
 
@@ -153,39 +155,48 @@ fun ActivityItem(
 @Preview(showBackground = true)
 @Composable
 fun ActivityItemPreview() {
-    val dummyActivity = Category(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
+    val dummyActivity = Category(percentage = 0.36, title = "Transport", thumbnail = "\uD83C\uDFED")
     ActivityItem(dummyActivity)
 }
 
 
 @Composable
-fun ActivitiesListPresenter(categories : List<Category>) {
+fun ActivitiesListPresenter(sharedViewModel: SharedViewModel) {
+
+
+    val targetCategories by sharedViewModel.categories.observeAsState()
+
     Text(
         text = "Activities",
         modifier = Modifier
             .padding(4.dp),
         style = MaterialTheme.typography.h5
     )
-
-    if (categories.isNotEmpty()){
-        LazyColumn{
-            items(categories.size){ index ->
-                ActivityItem(category = categories[index])
+    targetCategories?.let { listCategories ->
+        if (listCategories.isNotEmpty()){
+            LazyColumn{
+                items(listCategories.size){ index ->
+                    ActivityItem(category = listCategories[index])
+                }
             }
+        }else{
+            Text(text = "No hay actividades registradas aún")
         }
-    }else{
+    }?: run {
         Text(text = "No hay actividades registradas aún")
     }
 
 
 
+
+
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ActivitiesListPreview() {
-    val dummyActivity1 = Category(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
-    val dummyActivity2 = Category(percentage = 0.36f, title = "Transport", iconResource = R.drawable.ic_money)
-    ActivitiesListPresenter(listOf(dummyActivity1, dummyActivity2))
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ActivitiesListPreview() {
+//    val dummyActivity1 = Category(percentage = 0.36, title = "Transport", thumbnail = "\uD83C\uDFE1")
+//    val dummyActivity2 = Category(percentage = 0.36, title = "Transport", thumbnail = "\uD83D\uDE8B")
+//    ActivitiesListPresenter()
+//}
 

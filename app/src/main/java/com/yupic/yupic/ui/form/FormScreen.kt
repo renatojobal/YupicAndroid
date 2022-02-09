@@ -23,12 +23,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.yupic.yupic.SharedViewModel
 import com.yupic.yupic.model.Node
 import com.yupic.yupic.model.Option
+import com.yupic.yupic.ui.EMOJI_DEFAULT
 import com.yupic.yupic.ui.NODE_TYPE_MULTIPLE_CHOICE
 import com.yupic.yupic.ui.NotFound
 import com.yupic.yupic.ui.offset.ProjectCard
@@ -37,13 +39,11 @@ import timber.log.Timber
 
 @ExperimentalPagerApi
 @Composable
-fun FormScreen() {
+fun FormScreen(sharedViewModel: SharedViewModel) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
     ) {
-
-        val sharedViewModel = viewModel<SharedViewModel>(LocalContext.current as ComponentActivity)
 
         val targetNodes = sharedViewModel.formNodes.observeAsState()
 
@@ -62,7 +62,10 @@ fun FormScreen() {
                     } else { // Show normal question card
                         QuestionCard(
                             fetchedNodes[page]
-                        )
+                        ){ updatedNode ->
+
+                           sharedViewModel.updateNode(updatedNode)
+                        }
                     }
 
                 }
@@ -105,7 +108,7 @@ fun SubmitButton(onSubmit : () -> Unit) {
 }
 
 @Composable
-fun QuestionCard(node: Node) {
+fun QuestionCard(node: Node, onUpdateNode: (Node) -> Unit) {
 
     val selectedOption = remember { (mutableStateOf<Option?>(null)) }
 
@@ -144,7 +147,7 @@ fun QuestionCard(node: Node) {
         ) {
 
 
-            // Box of temperature with emoji
+            // Box with emoji
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -152,18 +155,28 @@ fun QuestionCard(node: Node) {
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colors.secondaryVariant)
             ) {
-                Text(text = node.thumbnail ?: "\uD83D\uDD25")
+                val emojiContent =  if(node.category?.thumbnail?.isNotEmpty() == true){
+                    node.category?.thumbnail ?: EMOJI_DEFAULT
+                }else{
+                    EMOJI_DEFAULT
+                }
+                Text(text = emojiContent, style = MaterialTheme.typography.h5)
+
             }
 
             Text(text = node.subtitle)
 
             if(node.type == NODE_TYPE_MULTIPLE_CHOICE){ // Present options
                 LazyColumn{
-                    node.options?.let {
-                        items(items = it, itemContent = {item ->
+                    node.options?.let { optionList ->
+                        items(items = optionList, itemContent = {item ->
 
-                            SingleSelectableItem(item, selectedValue = selectedOption.value){
-                                selectedOption.value = it
+                            SingleSelectableItem(item, selectedValue = selectedOption.value){selected ->
+                                selectedOption.value = selected
+                                node.options?.forEach {
+                                    it.selected = (selected.title == it.title)
+                                }
+                                onUpdateNode(node)
                             }
 
                         })
@@ -181,8 +194,10 @@ fun QuestionCard(node: Node) {
                     TextField(
                         value = text,
                         onValueChange = { value ->
-                            if (value.length <= 3) {
-                                text = value.filter { it.isDigit() }
+                            if (value.length <= 2 && value.isDigitsOnly()) {
+                                text = value
+                                node.response = value.toDouble()
+                                onUpdateNode(node)
                             }
                         },
                         keyboardOptions = KeyboardOptions(
@@ -272,15 +287,15 @@ fun SingleSelectableItemPreview(){
     }
 }
 
-@ExperimentalPagerApi
-@Preview(showBackground = true)
-@Composable
-fun FormScreenPreview() {
-    YupicTheme {
-        FormScreen()
-    }
-
-}
+//@ExperimentalPagerApi
+//@Preview(showBackground = true)
+//@Composable
+//fun FormScreenPreview() {
+//    YupicTheme {
+//        FormScreen(sharedViewModel)
+//    }
+//
+//}
 
 @Preview(showBackground = true)
 @Composable
@@ -307,7 +322,7 @@ fun QuestionCardPreview() {
                     )
                 )
             )
-        )
+        ){}
     }
 
 
