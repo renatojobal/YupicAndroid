@@ -4,7 +4,6 @@ import com.yupic.yupic.ui.NODE_TYPE_MULTIPLE_CHOICE
 
 data class Node (
     var key : String = "",
-    val title: String = "",
     val subtitle: String = "",
     val thumbnail: String? = "",
     var response: Double? = 0.0,

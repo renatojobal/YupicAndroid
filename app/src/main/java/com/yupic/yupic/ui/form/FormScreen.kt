@@ -99,7 +99,7 @@ fun SubmitButton(onSubmit : () -> Unit) {
     ) {
         Button(onClick = { onSubmit() }) {
             Text(
-                text = "Calcular",
+                text = "CALCULAR",
                 style = MaterialTheme.typography.button
             )
         }
@@ -194,10 +194,13 @@ fun QuestionCard(node: Node, onUpdateNode: (Node) -> Unit) {
                     TextField(
                         value = text,
                         onValueChange = { value ->
-                            if (value.length <= 2 && value.isDigitsOnly()) {
+                            if (value.length <= 2) {
                                 text = value
-                                node.response = value.toDouble()
-                                onUpdateNode(node)
+                                if(value.isNotEmpty()){
+                                    node.response = value.filter { it.isDigit() }.toDouble()
+                                    onUpdateNode(node)
+                                }
+
                             }
                         },
                         keyboardOptions = KeyboardOptions(
@@ -229,8 +232,7 @@ fun SingleSelectableItem(option: Option, selectedValue : Option?,  onClickListen
                 color = MaterialTheme.colors.onSecondary,
                 shape = MaterialTheme.shapes.large
             )
-            .padding(8.dp),
-        contentAlignment = Alignment.Center
+            .padding(8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -259,7 +261,6 @@ fun SingleSelectableItem(option: Option, selectedValue : Option?,  onClickListen
 @Composable
 fun SingleSelectableItemPreview(){
     val example = Node(
-        title = "Transporte",
         subtitle = "¿Qúe tipo de vehículo usa?",
         factor = 10.0,
         type = "multipleChoice",
@@ -303,7 +304,6 @@ fun QuestionCardPreview() {
     YupicTheme {
         QuestionCard(
             Node(
-                title = "Transporte",
                 subtitle = "¿Qúe tipo de vehículo usa?",
                 factor = 10.0,
                 type = "multipleChoice",

@@ -64,33 +64,22 @@ class SharedViewModel(
                 Timber.i("Got result: ${result.documents}")
                 result.documents.forEach { docSnapshot ->
 
+
+                    val category = Category(docSnapshot.get("category") as HashMap<String, *>)
                     val node = Node(
                         key = docSnapshot.id,
                         subtitle = docSnapshot.getString("subtitle") ?: "",
                         response = docSnapshot.getDouble("response"),
                         factor = docSnapshot.getDouble("factor") ?: 0.0,
                         type = docSnapshot.getString("type") ?: "",
-                        result = docSnapshot.getDouble("result") ?: 0.0
+                        result = docSnapshot.getDouble("result") ?: 0.0,
+                        category = category
                     )
-
-                    val categoryRef = docSnapshot.getDocumentReference("category")
-
-                    categoryRef?.get()?.addOnSuccessListener {
-                        var category = it.toObject<Category>()
-                        category?.key = it.id
-
-                        if (!categories.contains(category)) {
-                            category?.let { safeCategory ->
-                                categories.add(safeCategory)
-                                node.category = safeCategory
-                                updateNode(node)
-                            }
-                        }
-
-
-                    }?.addOnFailureListener {
-                        Timber.e(it, "Error loading category")
+                    if (!categories.contains(category)){
+                        categories.add(category)
                     }
+
+
 
                     // Add options if type is multiple choice
                     if (node.type == NODE_TYPE_MULTIPLE_CHOICE) {

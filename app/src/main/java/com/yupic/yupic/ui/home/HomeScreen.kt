@@ -144,9 +144,15 @@ fun ActivityItem(
                 .fillMaxWidth()
                 .padding(16.dp)
         ){
-            Text(text = category.thumbnail?: "\uD83C\uDFED")
-            Text(text = category.title)
-            Text(text = (category.percentage?.times(100))?.toInt().toString())
+            Row (
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(text = category.thumbnail?: "\uD83C\uDFED")
+                Text(modifier = Modifier.padding(start=16.dp), text = category.title)
+            }
+
+            Text(text = category.categoryCarbonFootprintKg.trimDecimals())
         }
     }
 
