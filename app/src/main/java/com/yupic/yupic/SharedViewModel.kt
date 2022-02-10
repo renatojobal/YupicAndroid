@@ -42,8 +42,7 @@ class SharedViewModel(
     private val _categories: MutableLiveData<List<Category>?> = MutableLiveData(null)
     val categories: LiveData<List<Category>?> = _categories
 
-    private val _selectedCategory: MutableLiveData<Category?> = MutableLiveData(null)
-    val selectedCategory: LiveData<Category?> = _selectedCategory
+
 
     /**
      * Load form data
@@ -60,7 +59,7 @@ class SharedViewModel(
                         thumbnail = "\uD83E\uDD7E"
                     )
                 ) // The first category will be used to allocate the total
-                _selectedCategory.value = categories[0]
+
                 Timber.i("Got result: ${result.documents}")
                 result.documents.forEach { docSnapshot ->
 
@@ -139,8 +138,9 @@ class SharedViewModel(
 
             _categories.value?.forEach { category ->
                 if (node.category == category) {
-                    Timber.d("Category found")
+
                     category.categoryCarbonFootprintKg += node.result
+                    Timber.d("Category found")
                 }
             }
         }
