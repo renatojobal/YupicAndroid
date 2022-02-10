@@ -43,7 +43,6 @@ class SharedViewModel(
     val categories: LiveData<List<Category>?> = _categories
 
 
-
     /**
      * Load form data
      */
@@ -74,10 +73,9 @@ class SharedViewModel(
                         result = docSnapshot.getDouble("result") ?: 0.0,
                         category = category
                     )
-                    if (!categories.contains(category)){
+                    if (!categories.contains(category)) {
                         categories.add(category)
                     }
-
 
 
                     // Add options if type is multiple choice
@@ -178,6 +176,15 @@ class SharedViewModel(
         }
         _formNodes.value = dummyList
 
+    }
+
+    /**
+     * Dark theme
+     */
+    private val _darkThemeOn = MutableLiveData(false)
+    var darkThemeOn: LiveData<Boolean> = _darkThemeOn
+    fun toggleTheme() {
+        _darkThemeOn.value = _darkThemeOn.value?.not()
     }
 
     init {

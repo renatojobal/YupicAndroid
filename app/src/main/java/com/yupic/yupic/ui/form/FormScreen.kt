@@ -1,30 +1,21 @@
 package com.yupic.yupic.ui.form
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.text.isDigitsOnly
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.yupic.yupic.SharedViewModel
@@ -33,13 +24,12 @@ import com.yupic.yupic.model.Option
 import com.yupic.yupic.ui.EMOJI_DEFAULT
 import com.yupic.yupic.ui.NODE_TYPE_MULTIPLE_CHOICE
 import com.yupic.yupic.ui.NotFound
-import com.yupic.yupic.ui.offset.ProjectCard
 import com.yupic.yupic.ui.theme.YupicTheme
 import timber.log.Timber
 
 @ExperimentalPagerApi
 @Composable
-fun FormScreen(sharedViewModel: SharedViewModel) {
+fun FormScreen(sharedViewModel: SharedViewModel, onSubmit: () -> Unit) {
     BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
@@ -48,35 +38,34 @@ fun FormScreen(sharedViewModel: SharedViewModel) {
         val targetNodes = sharedViewModel.formNodes.observeAsState()
 
         targetNodes.value?.let { fetchedNodes ->
-            if(fetchedNodes.isNotEmpty()){
+            if (fetchedNodes.isNotEmpty()) {
                 HorizontalPager(
-                    count = fetchedNodes.size + 1 , // The last page will show the submit button
+                    count = fetchedNodes.size + 1, // The last page will show the submit button
                     contentPadding = PaddingValues(horizontal = 24.dp)
-                ) { page : Int ->
+                ) { page: Int ->
 
-                    if(page == fetchedNodes.size){ // If it is the last page show submit button
+                    if (page == fetchedNodes.size) { // If it is the last page show submit button
                         SubmitButton {
-                            sharedViewModel.calculateFormResult()
+                            onSubmit()
+
 
                         }
                     } else { // Show normal question card
                         QuestionCard(
                             fetchedNodes[page]
-                        ){ updatedNode ->
+                        ) { updatedNode ->
 
-                           sharedViewModel.updateNode(updatedNode)
+                            sharedViewModel.updateNode(updatedNode)
                         }
                     }
 
                 }
-            }else{
+            } else {
                 NotFound()
             }
         } ?: run {
             NotFound()
         }
-
-
 
 
     }
@@ -92,9 +81,10 @@ fun SubmitButtonPreview() {
 }
 
 @Composable
-fun SubmitButton(onSubmit : () -> Unit) {
-    BoxWithConstraints(modifier = Modifier
-        .fillMaxSize(),
+fun SubmitButton(onSubmit: () -> Unit) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Button(onClick = { onSubmit() }) {
@@ -155,9 +145,9 @@ fun QuestionCard(node: Node, onUpdateNode: (Node) -> Unit) {
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colors.secondaryVariant)
             ) {
-                val emojiContent =  if(node.category?.thumbnail?.isNotEmpty() == true){
+                val emojiContent = if (node.category?.thumbnail?.isNotEmpty() == true) {
                     node.category?.thumbnail ?: EMOJI_DEFAULT
-                }else{
+                } else {
                     EMOJI_DEFAULT
                 }
                 Text(text = emojiContent, style = MaterialTheme.typography.h5)
@@ -166,12 +156,15 @@ fun QuestionCard(node: Node, onUpdateNode: (Node) -> Unit) {
 
             Text(text = node.subtitle)
 
-            if(node.type == NODE_TYPE_MULTIPLE_CHOICE){ // Present options
-                LazyColumn{
+            if (node.type == NODE_TYPE_MULTIPLE_CHOICE) { // Present options
+                LazyColumn {
                     node.options?.let { optionList ->
-                        items(items = optionList, itemContent = {item ->
+                        items(items = optionList, itemContent = { item ->
 
-                            SingleSelectableItem(item, selectedValue = selectedOption.value){selected ->
+                            SingleSelectableItem(
+                                item,
+                                selectedValue = selectedOption.value
+                            ) { selected ->
                                 selectedOption.value = selected
                                 node.options?.forEach {
                                     it.selected = (selected.title == it.title)
@@ -183,20 +176,21 @@ fun QuestionCard(node: Node, onUpdateNode: (Node) -> Unit) {
                     }
                 }
 
-            }else { // Present input text
+            } else { // Present input text
                 var text by remember {
                     mutableStateOf("")
                 }
-                Surface(modifier = Modifier
-                    .padding(top = 128.dp)
-                    .size(width = 64.dp, height = 64.dp)
+                Surface(
+                    modifier = Modifier
+                        .padding(top = 128.dp)
+                        .size(width = 64.dp, height = 64.dp)
                 ) {
                     TextField(
                         value = text,
                         onValueChange = { value ->
                             if (value.length <= 2) {
                                 text = value
-                                if(value.isNotEmpty()){
+                                if (value.isNotEmpty()) {
                                     node.response = value.filter { it.isDigit() }.toDouble()
                                     onUpdateNode(node)
                                 }
@@ -212,16 +206,18 @@ fun QuestionCard(node: Node, onUpdateNode: (Node) -> Unit) {
             }
 
 
-
         }
 
     }
 }
 
 
-
 @Composable
-fun SingleSelectableItem(option: Option, selectedValue : Option?,  onClickListener: (Option) -> Unit) {
+fun SingleSelectableItem(
+    option: Option,
+    selectedValue: Option?,
+    onClickListener: (Option) -> Unit
+) {
     val isChecked = option.title == selectedValue?.title ?: "z"
 
     BoxWithConstraints(
@@ -236,8 +232,7 @@ fun SingleSelectableItem(option: Option, selectedValue : Option?,  onClickListen
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 8.dp)
-            ,
+                .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -248,7 +243,8 @@ fun SingleSelectableItem(option: Option, selectedValue : Option?,  onClickListen
                     onClickListener(option)
                 }
             )
-            Text(modifier = Modifier.padding(start = 8.dp),
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
                 text = option.title,
                 style = MaterialTheme.typography.body1
             )
@@ -259,7 +255,7 @@ fun SingleSelectableItem(option: Option, selectedValue : Option?,  onClickListen
 
 @Preview
 @Composable
-fun SingleSelectableItemPreview(){
+fun SingleSelectableItemPreview() {
     val example = Node(
         subtitle = "¿Qúe tipo de vehículo usa?",
         factor = 10.0,
@@ -281,8 +277,10 @@ fun SingleSelectableItemPreview(){
     )
 
     YupicTheme {
-        SingleSelectableItem(option = example.options?.get(1)!!,
-            selectedValue = example.options?.get(0)!!){
+        SingleSelectableItem(
+            option = example.options?.get(1)!!,
+            selectedValue = example.options?.get(0)!!
+        ) {
 
         }
     }
@@ -322,7 +320,7 @@ fun QuestionCardPreview() {
                     )
                 )
             )
-        ){}
+        ) {}
     }
 
 

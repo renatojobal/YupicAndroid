@@ -28,14 +28,14 @@ import com.yupic.yupic.model.Category
 import timber.log.Timber
 
 @Composable
-fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
+fun HomeScreen(sharedViewModel: SharedViewModel, onOffsetClicked: () -> Unit) {
 
 
     val targetCategories by sharedViewModel.categories.observeAsState()
-    var selectedCategory  by remember { (mutableStateOf(targetCategories?.get(0))) }
+    var selectedCategory by remember { (mutableStateOf(targetCategories?.get(0))) }
 
 
-    val animDuration  = 1000
+    val animDuration = 1000
     val animDelay = 0
 
 
@@ -52,7 +52,7 @@ fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 48.dp)
             .fillMaxSize()
-    ){
+    ) {
 
 
         Column(
@@ -76,7 +76,10 @@ fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
             ) {
                 Text(text = "COMPENSAR", style = MaterialTheme.typography.button)
             }
-            ActivitiesListPresenter(sharedViewModel, selectedCategory = selectedCategory){ wantedCategory ->
+            ActivitiesListPresenter(
+                sharedViewModel,
+                selectedCategory = selectedCategory
+            ) { wantedCategory ->
                 Timber.i("New category selected")
                 selectedCategory = wantedCategory
 
@@ -102,21 +105,20 @@ fun CircularProgressBar(
     radius: Dp = 100.dp,
     color: Color = MaterialTheme.colors.onSurface,
     strokeWidth: Dp = 8.dp
-    ) {
+) {
 
 
-    
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(radius * 2f)
             .padding(8.dp)
-    ){
-        Canvas(modifier = Modifier.size(radius * 2f)){
+    ) {
+        Canvas(modifier = Modifier.size(radius * 2f)) {
             drawArc(
                 color = color,
                 -90f,
-                (360 * percentage/100),
+                (360 * percentage / 100),
                 useCenter = false,
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
@@ -129,7 +131,7 @@ fun CircularProgressBar(
 
         )
     }
-    
+
 }
 
 @Preview(showBackground = true)
@@ -145,14 +147,14 @@ fun ActivityItem(
     onSelectedCategory: (Category) -> Unit
 ) {
 
-    val itemModifier : Modifier = if(selectedCategory == presentingCategory){
+    val itemModifier: Modifier = if (selectedCategory == presentingCategory) {
         Modifier
             .background(
                 color = MaterialTheme.colors.surface,
                 shape = MaterialTheme.shapes.medium
             )
             .fillMaxWidth()
-    }else{
+    } else {
         Modifier
             .fillMaxWidth()
     }
@@ -160,22 +162,31 @@ fun ActivityItem(
     Box(
         modifier = itemModifier
     ) {
-        Row (
+        Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-        ){
-            Row (
+        ) {
+            Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
-            ){
-                Text(text = (presentingCategory.thumbnail?: "\uD83C\uDFED"), modifier = Modifier.clickable { onSelectedCategory(presentingCategory) })
-                Text(modifier = Modifier.padding(start=16.dp).clickable { onSelectedCategory(presentingCategory) }, text = presentingCategory.title)
+            ) {
+                Text(
+                    text = (presentingCategory.thumbnail ?: "\uD83C\uDFED"),
+                    modifier = Modifier.clickable { onSelectedCategory(presentingCategory) })
+                Text(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .clickable { onSelectedCategory(presentingCategory) },
+                    text = presentingCategory.title
+                )
             }
 
-            Text(text = presentingCategory.categoryCarbonFootprintKg.trimDecimals(), modifier = Modifier.clickable { onSelectedCategory(presentingCategory) })
+            Text(
+                text = presentingCategory.categoryCarbonFootprintKg.trimDecimals(),
+                modifier = Modifier.clickable { onSelectedCategory(presentingCategory) })
         }
     }
 
@@ -190,7 +201,11 @@ fun ActivityItemPreview() {
 
 
 @Composable
-fun ActivitiesListPresenter(sharedViewModel: SharedViewModel, selectedCategory: Category?, onSelectedCategory: (Category) -> Unit) {
+fun ActivitiesListPresenter(
+    sharedViewModel: SharedViewModel,
+    selectedCategory: Category?,
+    onSelectedCategory: (Category) -> Unit
+) {
 
 
     val targetCategories by sharedViewModel.categories.observeAsState()
@@ -203,23 +218,23 @@ fun ActivitiesListPresenter(sharedViewModel: SharedViewModel, selectedCategory: 
         style = MaterialTheme.typography.h5
     )
     targetCategories?.let { listCategories ->
-        if (listCategories.isNotEmpty()){
-            LazyColumn{
-                items(listCategories.size){ index ->
-                    ActivityItem(presentingCategory = listCategories[index], selectedCategory = selectedCategory){
+        if (listCategories.isNotEmpty()) {
+            LazyColumn {
+                items(listCategories.size) { index ->
+                    ActivityItem(
+                        presentingCategory = listCategories[index],
+                        selectedCategory = selectedCategory
+                    ) {
                         onSelectedCategory(it)
                     }
                 }
             }
-        }else{
+        } else {
             Text(text = "No hay actividades registradas aún")
         }
-    }?: run {
+    } ?: run {
         Text(text = "No hay actividades registradas aún")
     }
-
-
-
 
 
 }

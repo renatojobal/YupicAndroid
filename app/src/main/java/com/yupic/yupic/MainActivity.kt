@@ -9,10 +9,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -20,15 +18,13 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -168,7 +164,7 @@ class MainActivity : ComponentActivity() {
                     carbonFootprint = 4813.45
                 )
             )
-        }else{
+        } else {
             Timber.w("User is null")
         }
 
@@ -187,7 +183,10 @@ class MainActivity : ComponentActivity() {
 @ExperimentalAnimationApi
 @Composable
 fun YupicAppCompose(sharedViewModel: SharedViewModel, signIn: () -> Unit) {
-    YupicTheme {
+
+    val darkTheme by sharedViewModel.darkThemeOn.observeAsState()
+
+    YupicTheme(darkTheme = (darkTheme ?: false)) {
 
         val navController = rememberNavController()
         val backStackEntry = navController.currentBackStackEntryAsState()
@@ -237,14 +236,53 @@ fun YupicAppCompose(sharedViewModel: SharedViewModel, signIn: () -> Unit) {
 
                                 }
                         ) {
-                            Button(onClick = {
-                                sharedViewModel.logoutUser()
-                                scope.launch {
-                                    drawerState.close()
+
+
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp)
+                                .clickable {
+                                    sharedViewModel.logoutUser()
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
                                 }
-                            }) {
-                                Text(text = "Cerrar sesión")
+                            ) {
+                                Divider(color = MaterialTheme.colors.background, thickness = 1.dp)
+
+                                Row(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(text = "Cerrar sesión")
+                                }
+
                             }
+
+
+
+
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp)
+                                .clickable {
+                                    sharedViewModel.toggleTheme()
+                                }) {
+                                Divider(color = MaterialTheme.colors.background, thickness = 1.dp)
+
+                                Row(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(text = "Cambiar tema")
+
+                                }
+
+                            }
+
+
                         }
                     }
 
@@ -272,7 +310,8 @@ fun YupicAppCompose(sharedViewModel: SharedViewModel, signIn: () -> Unit) {
                 }
             )
             {
-                YupicNavHost(sharedViewModel,
+                YupicNavHost(
+                    sharedViewModel,
                     navHostController = navController,
                     bottomBarState = bottomBarState
                 ) { signIn() }
@@ -322,7 +361,10 @@ fun YupicNavHost(
             bottomBarState.value = true
         }
         composable(route = BottomNavigationItem.Form.route) {
-            FormScreen(sharedViewModel)
+            FormScreen(sharedViewModel) {
+                sharedViewModel.calculateFormResult()
+                navHostController.navigate(BottomNavigationItem.Home.route)
+            }
             // show BottomBar
             bottomBarState.value = true
         }
@@ -442,4 +484,5 @@ fun BottomNavBarPreview() {
     }
 
 }
+
 

@@ -20,7 +20,7 @@ fun LoginScreen(onLoggedSuccess: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .padding(top=64.dp)
+            .padding(top = 64.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -30,7 +30,7 @@ fun LoginScreen(onLoggedSuccess: () -> Unit) {
                 contentDescription = "yupic",
                 modifier = Modifier.fillMaxWidth()
             )
-            
+
             Text(
                 text = "YUPIC",
                 style = MaterialTheme.typography.h2,
@@ -41,16 +41,15 @@ fun LoginScreen(onLoggedSuccess: () -> Unit) {
                 .padding(horizontal = 40.dp, vertical = 8.dp)
                 .fillMaxWidth()
 
-            Button(modifier = modifierButton,onClick = {
+            Button(modifier = modifierButton, onClick = {
                 onLoggedSuccess()
             }) {
                 Text(text = "LOGIN WITH GOOGLE", style = MaterialTheme.typography.button)
             }
 
 
-
         }
-        
+
     }
 }
 
