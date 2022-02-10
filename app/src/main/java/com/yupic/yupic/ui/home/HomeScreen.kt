@@ -32,22 +32,15 @@ fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
 
 
     val targetCategories by sharedViewModel.categories.observeAsState()
-    val selectedCategory  = remember { (mutableStateOf(targetCategories?.get(0))) }
+    var selectedCategory  by remember { (mutableStateOf(targetCategories?.get(0))) }
 
 
-    var animationPlayed by remember {
-        mutableStateOf(false)
-    }
     val animDuration  = 1000
     val animDelay = 0
 
 
-    LaunchedEffect(key1 = true){
-        animationPlayed = true
-    }
-
-    val currentPercentage = animateFloatAsState(
-        targetValue = (if (animationPlayed) selectedCategory.value?.percentage ?: 0f else 0.0).toFloat(),
+    val currentPercentage by animateFloatAsState(
+        targetValue = (selectedCategory?.percentage ?: 0.0).toFloat(),
         animationSpec = tween(
             durationMillis = animDuration,
             delayMillis = animDelay
@@ -67,14 +60,14 @@ fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
             modifier = Modifier.fillMaxSize()
         ) {
 
-            selectedCategory.value?.let { safeCategory ->
+            selectedCategory?.let { safeCategory ->
                 Text(text = safeCategory.title + " " + safeCategory.thumbnail)
             }
 
             CircularProgressBar(
-                percentage = currentPercentage.value,
+                percentage = currentPercentage,
                 suffix = " kg",
-                insideText = selectedCategory.value?.categoryCarbonFootprintKg?.trimDecimals() ?: "0"
+                insideText = selectedCategory?.categoryCarbonFootprintKg?.trimDecimals() ?: "0"
             )
             Button(
                 modifier = Modifier
@@ -83,10 +76,9 @@ fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
             ) {
                 Text(text = "COMPENSAR", style = MaterialTheme.typography.button)
             }
-            ActivitiesListPresenter(sharedViewModel, selectedCategory = selectedCategory.value){ wantedCategory ->
+            ActivitiesListPresenter(sharedViewModel, selectedCategory = selectedCategory){ wantedCategory ->
                 Timber.i("New category selected")
-                selectedCategory.value = wantedCategory
-                animationPlayed = false
+                selectedCategory = wantedCategory
 
             }
         }
@@ -103,14 +95,15 @@ fun HomeScreen (sharedViewModel: SharedViewModel, onOffsetClicked : () -> Unit){
 
 @Composable
 fun CircularProgressBar(
-    percentage : Float = 0f,
-    suffix : String = "",
-    insideText : String = percentage.toString(),
+    percentage: Float = 0f,
+    suffix: String = "",
+    insideText: String = percentage.toString(),
     fontSize: TextUnit = 28.sp,
     radius: Dp = 100.dp,
-    color : Color = MaterialTheme.colors.onSurface,
-    strokeWidth : Dp = 8.dp
-) {
+    color: Color = MaterialTheme.colors.onSurface,
+    strokeWidth: Dp = 8.dp
+    ) {
+
 
     
     Box(
@@ -123,7 +116,7 @@ fun CircularProgressBar(
             drawArc(
                 color = color,
                 -90f,
-                (360 * percentage),
+                (360 * percentage/100),
                 useCenter = false,
                 style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round)
             )
