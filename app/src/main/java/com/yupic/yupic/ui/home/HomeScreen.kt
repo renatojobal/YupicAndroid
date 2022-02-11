@@ -61,7 +61,9 @@ fun HomeScreen(sharedViewModel: SharedViewModel, onOffsetClicked: () -> Unit) {
         ) {
 
             selectedCategory?.let { safeCategory ->
-                Text(text = safeCategory.title + " " + safeCategory.thumbnail)
+                Text(text = safeCategory.title + " " + safeCategory.thumbnail,
+                style = MaterialTheme.typography.h5,
+                modifier = Modifier.padding(top=8.dp))
             }
 
             CircularProgressBar(
